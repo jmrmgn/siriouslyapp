@@ -72,7 +72,10 @@ const useCategories = () => {
       category => category.id === categoryId,
     );
     const newCategories = categories;
-    categories[categoryIndex] = entry;
+    newCategories[categoryIndex] = {
+      ...newCategories[categoryIndex],
+      ...entry,
+    };
     // Update the selected category
     await setItem(JSON.stringify(newCategories));
     // Update the state
