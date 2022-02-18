@@ -1,10 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import useCategories, { Category as ICategory } from '@/hooks/useCategories';
+import useCategories, { Category as ICategory } from 'hooks/useCategories';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconButton } from 'react-native-paper';
+import Tts from 'react-native-tts';
+import useVoiceRecognition from 'hooks/useVoiceRecognition';
 
+const noResultPhrases = [
+  "Please repeat your statement, I can't even understand",
+  'Hey, what is it again?!',
+  'Go get someone to talk to',
+];
+
+// TODO: Move from the other
 const findPhrase = (sentence: string, categories: ICategory[]): string => {
   /*
     - Get the sentence
@@ -35,7 +43,8 @@ const findPhrase = (sentence: string, categories: ICategory[]): string => {
     phrase = matchedWords[0].phrase;
   } else {
     // TODO: Need to setup
-    phrase = "Please repeat your statement, I can't even understand";
+    const randNum = Math.floor(Math.random() * noResultPhrases.length);
+    phrase = noResultPhrases[randNum];
   }
 
   return phrase;
@@ -43,23 +52,41 @@ const findPhrase = (sentence: string, categories: ICategory[]): string => {
 
 const HomeScreen = () => {
   const { categories } = useCategories();
-  useEffect(() => {
-    removeName();
-  }, []);
+  const { results, onStartRecognizing, onStopRecognizing } =
+    useVoiceRecognition();
+  const [isRecord, setIsRecord] = useState(false);
 
-  const removeName = async () => {
-    await AsyncStorage.removeItem('@AuthData');
+  const handleStart = () => {
+    onStartRecognizing();
+    setIsRecord(true);
   };
+
+  const handleStop = () => {
+    onStopRecognizing();
+    setIsRecord(false);
+    const response = findPhrase(results, categories);
+    console.log('# response', response);
+    console.log('# categories', categories);
+    setTimeout(() => {
+      Tts.speak(response);
+    }, 1000);
+  };
+
+  const icon = isRecord ? 'stop-circle' : 'microphone';
+  const iconColor = isRecord ? 'red' : 'gray';
+  const text = isRecord ? 'Listening...' : 'Tap to speak';
 
   return (
     <View style={style.container}>
+      <Text>{results}</Text>
       <IconButton
         style={style.micButton}
-        icon="microphone"
-        onPress={() => findPhrase('Something', categories)}
+        icon={icon}
+        onPress={isRecord ? handleStop : handleStart}
         size={70}
+        color={iconColor}
       />
-      <Text>Tap to Speak</Text>
+      <Text>{text}</Text>
     </View>
   );
 };

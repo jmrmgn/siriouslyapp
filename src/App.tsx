@@ -1,6 +1,7 @@
 import 'react-native-gesture-handler';
 
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 
 // Context
 import { Provider as AuthProvider } from '@/contexts/Auth';
@@ -17,6 +18,12 @@ const theme = {
     // text: '#717171',
   },
 };
+
+// To remove tts warning
+const ee = new NativeEventEmitter(NativeModules.TextToSpeech);
+ee.addListener('tts-start', () => {});
+ee.addListener('tts-finish', () => {});
+ee.addListener('tts-cancel', () => {});
 
 export default function App() {
   return (

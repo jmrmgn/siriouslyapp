@@ -10,8 +10,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import useCategories, { Category as CategoryProp } from 'hooks/useCategories';
 
-import { ItemHeader } from '@/components/common';
-import useAuth from '@/hooks/useAuth';
+import { ItemHeader } from 'components/common';
+import useAuth from 'hooks/useAuth';
 
 type InputGroupProps = React.ComponentProps<typeof TextInput> & {
   label: string;
@@ -85,7 +85,8 @@ const NameField: React.FC = () => {
 };
 
 const Categories: React.FC = () => {
-  const { categories, addCategory, deleteCategory } = useCategories();
+  const { categories, addCategory, deleteCategory, updateCategory } =
+    useCategories();
   const [showDialog, setShowDialog] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [phrase, setPhrase] = useState('');
@@ -99,13 +100,18 @@ const Categories: React.FC = () => {
     clearCategoryForm();
   };
 
-  const handleAddCategory = () => {
-    addCategory({ keyword, phrase });
+  const handleManageCategory = () => {
+    if (edit) {
+      updateCategory(category?.id as number, { keyword, phrase });
+    } else {
+      addCategory({ keyword, phrase });
+    }
+
     handleCloseForm();
   };
 
   const handleDeleteCategory = () => {
-    if (category) {
+    if (category?.id) {
       deleteCategory(category.id as number);
       handleCloseForm();
     }
@@ -154,7 +160,7 @@ const Categories: React.FC = () => {
               </Button>
             ) : null}
             <Button onPress={handleCloseForm}>Cancel</Button>
-            <Button onPress={handleAddCategory}>Ok</Button>
+            <Button onPress={handleManageCategory}>Ok</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
