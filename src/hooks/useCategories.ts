@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
@@ -11,7 +11,6 @@ export type Category = {
 const CATEGORY_KEY = '@Categories';
 
 const useCategories = () => {
-  const isMounted = useRef(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<any>();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -32,9 +31,7 @@ const useCategories = () => {
       if (categoriesData) {
         // If there are data, it's converted to an Object and the state is updated.
         const _categories = JSON.parse(categoriesData);
-        if (isMounted.current) {
-          setCategories(_categories);
-        }
+        setCategories(_categories);
       }
     } catch (e) {
       setError(e);
@@ -92,10 +89,6 @@ const useCategories = () => {
 
   useEffect(() => {
     loadCategories();
-
-    return () => {
-      isMounted.current = false;
-    };
   }, [loadCategories]);
 
   return {

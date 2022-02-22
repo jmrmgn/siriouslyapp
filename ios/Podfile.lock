@@ -343,7 +343,7 @@ PODS:
     - React-perflogger (= 0.67.2)
   - RNCAsyncStorage (1.16.1):
     - React-Core
-  - RNGestureHandler (2.2.0):
+  - RNGestureHandler (2.1.1):
     - React-Core
   - RNScreens (3.11.1):
     - React-Core
@@ -558,13 +558,13 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 2450b43df7ffe8e805a0b3dcb2abd4282f1f1836
   ReactCommon: d98c6c96b567f9b3a15f9fd4cc302c1eda8e3cf2
   RNCAsyncStorage: c0754b486fec6e532d358bfd7337cb45c8d2c897
-  RNGestureHandler: bf572f552ea324acd5b5464b8d30755b2d8c1de6
+  RNGestureHandler: e1ad51d31a580755079d5124d3ab66f0fcaa8311
   RNScreens: 4d83613b50b74ed277026375dc0810893b0c347f
   RNVectorIcons: 7923e585eaeb139b9f4531d25a125a1500162a0b
   TextToSpeech: b3aa777ff5585705f179c0a2436bfd0926d1716e
   Yoga: 9b6696970c3289e8dea34b3eda93f23e61fb8121
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 07c459ba0a40f602a842933ab901908fde3078ca
+PODFILE CHECKSUM: a888f2e47c5d88273182febc9185e624972a9e61
 
 COCOAPODS: 1.11.2

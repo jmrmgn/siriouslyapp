@@ -1,16 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import useCategories, { Category as ICategory } from 'hooks/useCategories';
+import { Category as ICategory } from 'hooks/useCategories';
 
 import { IconButton } from 'react-native-paper';
 import Tts from 'react-native-tts';
-import useVoiceRecognition from 'hooks/useVoiceRecognition';
-
-const noResultPhrases = [
-  "Please repeat your statement, I can't even understand",
-  'Hey, what is it again?!',
-  'Go get someone to talk to',
-];
+import Voice from '@react-native-voice/voice';
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 
 // TODO: Move from the other
 const findPhrase = (sentence: string, categories: ICategory[]): string => {
@@ -26,18 +21,15 @@ const findPhrase = (sentence: string, categories: ICategory[]): string => {
 
       - get the first keyword from matchedWords array and return the phrase
   */
-  const words = sentence.split(' ');
+  let phrase;
   const matchedWords: ICategory[] = [];
 
-  words.forEach(word => {
-    categories.forEach(category => {
-      if (word.toLowerCase() === category.keyword.toLowerCase()) {
-        matchedWords.push(category);
-      }
-    });
+  categories.forEach(category => {
+    if (sentence.toLowerCase().indexOf(category.keyword.toLowerCase()) !== -1) {
+      matchedWords.push(category);
+    }
   });
 
-  let phrase;
   // Has matchedWords
   if (matchedWords.length > 0) {
     phrase = matchedWords[0].phrase;
@@ -50,26 +42,77 @@ const findPhrase = (sentence: string, categories: ICategory[]): string => {
   return phrase;
 };
 
+const noResultPhrases = [
+  "Please repeat your statement, I can't even understand",
+  'Hey, what is it again?!',
+  'Go get someone to talk to',
+];
+
 const HomeScreen = () => {
-  const { categories } = useCategories();
-  const { results, onStartRecognizing, onStopRecognizing } =
-    useVoiceRecognition();
+  const [command, setCommand] = useState('');
+  const [response, setResponse] = useState('');
   const [isRecord, setIsRecord] = useState(false);
 
-  const handleStart = () => {
-    onStartRecognizing();
-    setIsRecord(true);
-  };
+  const { getItem } = useAsyncStorage('@Categories');
 
-  const handleStop = () => {
-    onStopRecognizing();
-    setIsRecord(false);
-    const response = findPhrase(results, categories);
-    console.log('# response', response);
-    console.log('# categories', categories);
-    setTimeout(() => {
-      Tts.speak(response);
-    }, 1000);
+  const handleStop = useCallback(
+    async (_command: string) => {
+      if (_command !== '') {
+        const categoriesData = await getItem();
+        let categories;
+        if (categoriesData) {
+          // If there are data, it's converted to an Object and the state is updated.
+          categories = JSON.parse(categoriesData);
+        }
+        const _response = findPhrase(_command, categories);
+        setResponse(_response);
+        setTimeout(() => {
+          Tts.speak(_response);
+        }, 500);
+      }
+
+      setIsRecord(false);
+    },
+    [getItem],
+  );
+
+  useEffect(() => {
+    const onSpeechStart = () => {
+      // console.log('# started');
+    };
+
+    const onSpeechResults = (e: any) => {
+      const _command = e.value[0];
+      setCommand(_command);
+      handleStop(_command);
+    };
+
+    const onSpeechEnd = () => {
+      Voice.stop();
+      setIsRecord(false);
+      // console.log('# ended');
+    };
+
+    const onSpeechError = (e: any) => {
+      setIsRecord(false);
+      // console.log(e);
+    };
+
+    Voice.onSpeechStart = onSpeechStart;
+    Voice.onSpeechResults = onSpeechResults;
+    Voice.onSpeechError = onSpeechError;
+    Voice.onSpeechEnd = onSpeechEnd;
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleStart = () => {
+    setCommand('');
+    Voice.start('en-US');
+    setIsRecord(true);
   };
 
   const icon = isRecord ? 'stop-circle' : 'microphone';
@@ -78,11 +121,12 @@ const HomeScreen = () => {
 
   return (
     <View style={style.container}>
-      <Text>{results}</Text>
+      {command ? <Text style={style.commandTxt}>{`"${command}"`}</Text> : null}
+      {/* <Text>Response: {response}</Text> */}
       <IconButton
         style={style.micButton}
         icon={icon}
-        onPress={isRecord ? handleStop : handleStart}
+        onPress={isRecord ? () => handleStop(command) : handleStart}
         size={70}
         color={iconColor}
       />
@@ -100,6 +144,10 @@ const style = StyleSheet.create({
   },
   micButton: {
     backgroundColor: '#FFF',
+  },
+  commandTxt: {
+    color: '#999999',
+    fontStyle: 'italic',
   },
 });
 

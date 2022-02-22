@@ -7,6 +7,8 @@ import useAuth from 'hooks/useAuth';
 
 interface Props {}
 
+Tts.setDefaultLanguage('en-US');
+
 const SetupScreen: React.FC<Props> = () => {
   const [name, setName] = useState('');
   const [errorMessage, setErrorMessage] = useState<string>();
