@@ -6,8 +6,8 @@ import {
   Portal,
   TextInput,
 } from 'react-native-paper';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import useCategories, { Category as CategoryProp } from 'hooks/useCategories';
 
 import { ItemHeader } from 'components/common';
@@ -143,12 +143,14 @@ const Categories: React.FC = () => {
               value={keyword}
               onChangeText={text => setKeyword(text)}
               placeholder="Input keyword"
+              autoCorrect={false}
             />
             <InputGroup
-              label="Phrase"
+              label="Response"
               value={phrase}
               onChangeText={text => setPhrase(text)}
-              placeholder="Input phrase"
+              placeholder="Input response"
+              autoCorrect={false}
             />
           </Dialog.Content>
           <Dialog.Actions style={categoriesStyle.actionButtons}>
@@ -169,8 +171,9 @@ const Categories: React.FC = () => {
         actionLabel="Add"
         onClickAction={() => setShowDialog(true)}
       />
-      {categories.map(category => {
-        return (
+      <FlatList
+        data={categories}
+        renderItem={({ item: category }) => (
           <List.Item
             key={category.id}
             title={category.keyword}
@@ -179,8 +182,9 @@ const Categories: React.FC = () => {
             descriptionStyle={style.description}
             onPress={() => handleClickCategory(category)}
           />
-        );
-      })}
+        )}
+        keyExtractor={item => String(item.id)}
+      />
     </>
   );
 };
