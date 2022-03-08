@@ -1,3 +1,4 @@
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import {
   Button,
   Dialog,
@@ -6,7 +7,6 @@ import {
   Portal,
   TextInput,
 } from 'react-native-paper';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import useCategories, { Category as CategoryProp } from 'hooks/useCategories';
 
@@ -62,9 +62,20 @@ const NameField: React.FC = () => {
               placeholder="Tell me your name"
             />
           </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setShowDialog(false)}>Cancel</Button>
-            <Button onPress={handleChangeName}>Ok</Button>
+          <Dialog.Actions style={style.formActions}>
+            <Button
+              style={style.formButton}
+              mode="outlined"
+              onPress={() => setShowDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              style={style.formButton}
+              mode="contained"
+              dark
+              onPress={handleChangeName}>
+              Ok
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -110,11 +121,22 @@ const Categories: React.FC = () => {
     handleCloseForm();
   };
 
-  const handleDeleteCategory = () => {
+  const handleDeleteCategory = (category: CategoryProp) => {
     if (category?.id) {
       deleteCategory(category.id as number);
       handleCloseForm();
     }
+  };
+
+  const handleLongPressCategory = (category: CategoryProp) => {
+    Alert.alert('Delete', 'Are you sure you want to delete this category?', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      { text: 'OK', onPress: () => handleDeleteCategory(category) },
+    ]);
   };
 
   const handleClickCategory = (category: CategoryProp): void => {
@@ -151,18 +173,24 @@ const Categories: React.FC = () => {
               onChangeText={text => setPhrase(text)}
               placeholder="Input response"
               autoCorrect={false}
+              multiline
+              numberOfLines={3}
             />
           </Dialog.Content>
-          <Dialog.Actions style={categoriesStyle.actionButtons}>
-            {edit ? (
-              <Button
-                onPress={handleDeleteCategory}
-                style={categoriesStyle.deleteActionButton}>
-                Delete
-              </Button>
-            ) : null}
-            <Button onPress={handleCloseForm}>Cancel</Button>
-            <Button onPress={handleManageCategory}>Ok</Button>
+          <Dialog.Actions style={style.formActions}>
+            <Button
+              onPress={handleCloseForm}
+              style={style.formButton}
+              mode="outlined">
+              Cancel
+            </Button>
+            <Button
+              onPress={handleManageCategory}
+              style={style.formButton}
+              mode="contained"
+              dark>
+              Ok
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -181,6 +209,7 @@ const Categories: React.FC = () => {
             titleStyle={style.title}
             descriptionStyle={style.description}
             onPress={() => handleClickCategory(category)}
+            onLongPress={() => handleLongPressCategory(category)}
           />
         )}
         keyExtractor={item => String(item.id)}
@@ -188,17 +217,6 @@ const Categories: React.FC = () => {
     </>
   );
 };
-
-const categoriesStyle = StyleSheet.create({
-  actionButtons: {
-    display: 'flex',
-  },
-  deleteActionButton: {
-    position: 'absolute',
-    top: 9,
-    left: 10,
-  },
-});
 
 const SettingsScreen: React.FC = () => {
   return (
@@ -218,6 +236,14 @@ const style = StyleSheet.create({
   },
   title: { color: '#000' },
   description: { fontSize: 14 },
+  formActions: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    justifyContent: 'space-between',
+  },
+  formButton: {
+    width: '47%',
+  },
 });
 
 export default SettingsScreen;
