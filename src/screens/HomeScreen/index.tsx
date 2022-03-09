@@ -1,11 +1,14 @@
+import AsyncStorage, {
+  useAsyncStorage
+} from '@react-native-async-storage/async-storage';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Category as ICategory } from 'hooks/useCategories';
 
+import { Category as ICategory } from 'hooks/useCategories';
 import { IconButton } from 'react-native-paper';
 import Tts from 'react-native-tts';
 import Voice from '@react-native-voice/voice';
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import { useAuthStore } from 'screens/SetupScreen/store/useAuthStore';
 
 // TODO: Move from the other
 const findPhrase = (sentence: string, categories: ICategory[]): string => {
@@ -45,7 +48,7 @@ const findPhrase = (sentence: string, categories: ICategory[]): string => {
 const noResultPhrases = [
   "Please repeat your statement, I can't even understand",
   'Hey, what is it again?!',
-  'Go get someone to talk to',
+  'Go get someone to talk to'
 ];
 
 const HomeScreen = () => {
@@ -73,10 +76,13 @@ const HomeScreen = () => {
 
       setIsRecord(false);
     },
-    [getItem],
+    [getItem]
   );
 
+  const signOut = useAuthStore(state => state.signOut);
+
   useEffect(() => {
+    // signOut();
     const onSpeechStart = () => {
       // console.log('# started');
     };
@@ -140,15 +146,15 @@ const style = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   micButton: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#FFF'
   },
   commandTxt: {
     color: '#999999',
-    fontStyle: 'italic',
-  },
+    fontStyle: 'italic'
+  }
 });
 
 export default HomeScreen;

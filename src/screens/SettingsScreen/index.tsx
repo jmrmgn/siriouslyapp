@@ -5,13 +5,13 @@ import {
   Divider,
   List,
   Portal,
-  TextInput,
+  TextInput
 } from 'react-native-paper';
 import React, { useState } from 'react';
 import useCategories, { Category as CategoryProp } from 'hooks/useCategories';
 
 import { ItemHeader } from 'components/common';
-import useAuth from 'hooks/useAuth';
+import { useAuthStore } from 'screens/SetupScreen/store/useAuthStore';
 
 type InputGroupProps = React.ComponentProps<typeof TextInput> & {
   label: string;
@@ -29,24 +29,16 @@ const InputGroup: React.FC<InputGroupProps> = props => {
 };
 
 const NameField: React.FC = () => {
-  const { authData, loading, signIn } = useAuth();
+  const _name = useAuthStore(state => state.name);
+  const signIn = useAuthStore(state => state.signIn);
 
   const [showDialog, setShowDialog] = useState(false);
-  const [name, setName] = useState(authData?.name);
+  const [name, setName] = useState<string>(_name ?? '');
 
-  const handleChangeName = async () => {
-    // Same as changing the name
-    await signIn(name);
+  const handleChangeName = () => {
+    signIn(name);
     setShowDialog(false);
   };
-
-  if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
 
   return (
     <>
@@ -66,14 +58,16 @@ const NameField: React.FC = () => {
             <Button
               style={style.formButton}
               mode="outlined"
-              onPress={() => setShowDialog(false)}>
+              onPress={() => setShowDialog(false)}
+            >
               Cancel
             </Button>
             <Button
               style={style.formButton}
               mode="contained"
               dark
-              onPress={handleChangeName}>
+              onPress={handleChangeName}
+            >
               Ok
             </Button>
           </Dialog.Actions>
@@ -85,7 +79,7 @@ const NameField: React.FC = () => {
         onClickAction={() => setShowDialog(true)}
       />
       <List.Item
-        title={authData?.name}
+        title={_name}
         description="Name"
         titleStyle={style.title}
         descriptionStyle={style.description}
@@ -133,9 +127,9 @@ const Categories: React.FC = () => {
       {
         text: 'Cancel',
         onPress: () => {},
-        style: 'cancel',
+        style: 'cancel'
       },
-      { text: 'OK', onPress: () => handleDeleteCategory(category) },
+      { text: 'OK', onPress: () => handleDeleteCategory(category) }
     ]);
   };
 
@@ -181,14 +175,16 @@ const Categories: React.FC = () => {
             <Button
               onPress={handleCloseForm}
               style={style.formButton}
-              mode="outlined">
+              mode="outlined"
+            >
               Cancel
             </Button>
             <Button
               onPress={handleManageCategory}
               style={style.formButton}
               mode="contained"
-              dark>
+              dark
+            >
               Ok
             </Button>
           </Dialog.Actions>
@@ -232,18 +228,18 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 10
   },
   title: { color: '#000' },
   description: { fontSize: 14 },
   formActions: {
     paddingHorizontal: 20,
     paddingBottom: 20,
-    justifyContent: 'space-between',
+    justifyContent: 'space-between'
   },
   formButton: {
-    width: '47%',
-  },
+    width: '47%'
+  }
 });
 
 export default SettingsScreen;

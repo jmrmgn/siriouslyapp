@@ -8,11 +8,7 @@ const Stack = createStackNavigator();
 const AuthStack: React.FC = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="Setup"
-        // component={SetupScreen}
-        component={SetupScreen}
-      />
+      <Stack.Screen name="Setup" component={SetupScreen} />
     </Stack.Navigator>
   );
 };

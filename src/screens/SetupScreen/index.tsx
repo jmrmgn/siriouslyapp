@@ -3,17 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import Tts from 'react-native-tts';
-import useAuth from 'hooks/useAuth';
-
-interface Props {}
+import { useAuthStore } from './store/useAuthStore';
 
 Tts.setDefaultLanguage('en-US');
 
-const SetupScreen: React.FC<Props> = () => {
+const SetupScreen = () => {
   const [name, setName] = useState('');
   const [errorMessage, setErrorMessage] = useState<string>();
 
-  const auth = useAuth();
+  const signIn = useAuthStore(state => state.signIn);
+  const _name = useAuthStore();
 
   useEffect(() => {
     init();
@@ -23,16 +22,18 @@ const SetupScreen: React.FC<Props> = () => {
     Tts.speak('What is your name?');
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     try {
       if (!name || name === '') {
         setErrorMessage('Name is required');
         return;
       }
 
-      await auth.signIn(name);
+      signIn(name);
     } catch (error) {}
   };
+
+  console.log('_', _name.name);
 
   return (
     <View style={style.container}>
@@ -50,7 +51,8 @@ const SetupScreen: React.FC<Props> = () => {
         icon="check-bold"
         mode="contained"
         onPress={handleSave}
-        dark>
+        dark
+      >
         Save
       </Button>
     </View>
@@ -61,15 +63,15 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   saveBtn: {
-    marginVertical: 10,
+    marginVertical: 10
   },
   errorMessage: {
     fontSize: 12,
-    color: '#d9534f',
-  },
+    color: '#d9534f'
+  }
 });
 
 export default SetupScreen;
