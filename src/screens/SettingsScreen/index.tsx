@@ -10,6 +10,7 @@ import {
 import React, { useState } from 'react';
 import useCategories, { Category as CategoryProp } from 'hooks/useCategories';
 
+import Configuration from './Configuration';
 import { ItemHeader } from 'components/common';
 import { useAuthStore } from 'screens/SetupScreen/store/useAuthStore';
 
@@ -219,7 +220,8 @@ const SettingsScreen: React.FC = () => {
     <View style={style.container}>
       <NameField />
       <Divider style={{ marginVertical: 10 }} />
-      <Categories />
+      <Configuration />
+      {/* <Categories /> */}
     </View>
   );
 };
