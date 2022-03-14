@@ -8,10 +8,10 @@ export const useAuthStore = create<IAuthStore>(
     (set, _get) => ({
       name: null,
       signIn: (name: string) => {
-        set(state => ({ ...state, name }));
+        set(() => ({ name }));
       },
       signOut: () => {
-        set(state => ({ ...state, name: null }));
+        set(() => ({ name: null }));
       }
     }),
     {
