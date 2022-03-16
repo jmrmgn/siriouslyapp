@@ -5,12 +5,12 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform,
-  StatusBar,
+  StatusBar
 } from 'react-native';
+import React, { useEffect } from 'react';
 
 // Context
 import { Provider as AuthProvider } from '@/contexts/Auth';
-import React, { useEffect } from 'react';
 // Router
 import { Router } from '@/routes/Router';
 
@@ -20,8 +20,8 @@ const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#E4771F',
-    // text: '#717171',
-  },
+    accent: '#E4771F'
+  }
 };
 
 // To remove tts warning

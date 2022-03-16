@@ -5,7 +5,7 @@ export interface IRandomResponse {
 
 export interface IRandomResponseStore {
   randomResponses: IRandomResponse[];
-  addRandomResponse: (randomResponse: IRandomResponse) => void;
+  addRandomResponse: (message: string) => void;
   editRandomResponse: (id: number, randomResponse: IRandomResponse) => void;
   deleteRandomResponse: (id: number) => void;
 }
