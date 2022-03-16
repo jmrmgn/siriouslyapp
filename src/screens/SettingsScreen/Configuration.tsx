@@ -17,9 +17,9 @@ const Configuration = () => {
         onPress={() => navigation.push('Categories')}
       />
       <List.Item
-        title="Responses"
+        title="Random Responses"
         left={props => <List.Icon {...props} icon="message-question" />}
-        onPress={() => navigation.push('Responses')}
+        onPress={() => navigation.push('RandomResponses')}
       />
     </>
   );
