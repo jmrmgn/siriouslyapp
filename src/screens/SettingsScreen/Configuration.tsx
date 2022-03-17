@@ -1,3 +1,4 @@
+import { EAppScreen } from 'routes/enums';
 import { ItemHeader } from 'components/common';
 import { List } from 'react-native-paper';
 import React from 'react';
@@ -14,12 +15,12 @@ const Configuration = () => {
         left={props => (
           <List.Icon {...props} icon="format-list-bulleted-square" />
         )}
-        onPress={() => navigation.push('Categories')}
+        onPress={() => navigation.push(EAppScreen.Categories)}
       />
       <List.Item
         title="Random Responses"
         left={props => <List.Icon {...props} icon="message-question" />}
-        onPress={() => navigation.push('Random Responses')}
+        onPress={() => navigation.push(EAppScreen.RandomResponses)}
       />
     </>
   );

@@ -1,4 +1,5 @@
 import CategoriesScreen from 'screens/Category/CategoriesScreen';
+import { EAppScreen } from './enums';
 import HomeScreen from '@/screens/HomeScreen';
 import Navbar from '@/components/layouts/Navbar';
 import RandomResponsesScreen from 'screens/RandomResponse/RandomResponsesScreen';
@@ -14,13 +15,16 @@ const AppStack: React.FC = () => {
       screenOptions={{ header: (props: any) => <Navbar {...props} /> }}
     >
       <Stack.Screen
-        name="Home"
+        name={EAppScreen.Home}
         component={HomeScreen}
         initialParams={{ isMain: true }}
       />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-      <Stack.Screen name="Categories" component={CategoriesScreen} />
-      <Stack.Screen name="Random Responses" component={RandomResponsesScreen} />
+      <Stack.Screen name={EAppScreen.Settings} component={SettingsScreen} />
+      <Stack.Screen name={EAppScreen.Categories} component={CategoriesScreen} />
+      <Stack.Screen
+        name={EAppScreen.RandomResponses}
+        component={RandomResponsesScreen}
+      />
     </Stack.Navigator>
   );
 };
