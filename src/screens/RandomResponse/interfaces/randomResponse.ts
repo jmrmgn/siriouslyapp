@@ -4,8 +4,10 @@ export interface IRandomResponse {
 }
 
 export interface IRandomResponseStore {
+  counter: number;
   randomResponses: IRandomResponse[];
+  getRandomResponse: (id: number) => IRandomResponse | undefined;
   addRandomResponse: (message: string) => void;
-  editRandomResponse: (id: number, randomResponse: IRandomResponse) => void;
+  updateRandomResponse: (id: number, message: string) => void;
   deleteRandomResponse: (id: number) => void;
 }

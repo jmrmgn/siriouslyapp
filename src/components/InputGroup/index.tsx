@@ -11,9 +11,9 @@ type InputGroupProps = React.ComponentProps<typeof TextInput> & {
 const InputGroup = (props: InputGroupProps) => {
   const { label } = props;
   return (
-    <View style={{ marginBottom: 20 }}>
+    <View>
       <Text>{label}</Text>
-      <TextInput dense {...props} label={undefined} />
+      <TextInput dense autoCorrect={false} {...props} label={undefined} />
     </View>
   );
 };

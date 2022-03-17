@@ -69,7 +69,8 @@
       "@/contexts/*": ["src/contexts/*"],
       "@/hooks/*": ["src/hooks/*"],
       "@/routes/*": ["src/routes/*"],
-      "@/screens/*": ["src/screens/*"]
+      "@/screens/*": ["src/screens/*"],
+      "@/interfaces/*": ["src/interfaces/*"]
     }
   },
   "exclude": [

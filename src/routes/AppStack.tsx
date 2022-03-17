@@ -20,7 +20,7 @@ const AppStack: React.FC = () => {
       />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Categories" component={CategoriesScreen} />
-      <Stack.Screen name="RandomResponses" component={RandomResponsesScreen} />
+      <Stack.Screen name="Random Responses" component={RandomResponsesScreen} />
     </Stack.Navigator>
   );
 };

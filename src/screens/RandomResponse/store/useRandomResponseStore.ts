@@ -16,25 +16,29 @@ const defaultRandRes: IRandomResponse[] = [
 export const useRandomResponseStore = create<IRandomResponseStore>(
   persist(
     (set, get) => ({
+      counter: 4,
       randomResponses: defaultRandRes,
+      getRandomResponse: (id: number) =>
+        get().randomResponses.find(entry => Number(entry.id) === Number(id)),
       addRandomResponse: (message: string): void => {
         set(() => ({
           randomResponses: [
             ...get().randomResponses,
-            { id: get().randomResponses.length + 1, message }
-          ]
+            { id: get().counter, message }
+          ],
+          counter: get().counter + 1
         }));
       },
-      editRandomResponse: (
-        id: number,
-        randomResponse: IRandomResponse
-      ): void => {
+      updateRandomResponse: (id: number, randomResponse: string): void => {
         set(() => {
           const randomResponses = [...get().randomResponses];
           const idx = randomResponses.findIndex(
             randRes => Number(randRes.id) === Number(id)
           );
-          randomResponses[idx] = randomResponse;
+          randomResponses[idx] = {
+            ...randomResponses[idx],
+            message: randomResponse
+          };
 
           return { randomResponses };
         });
