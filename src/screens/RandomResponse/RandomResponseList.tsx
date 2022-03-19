@@ -2,7 +2,7 @@ import { Alert, FlatList } from 'react-native';
 import { List, Text } from 'react-native-paper';
 import React, { useState } from 'react';
 
-import EmptyList from './EmptyList';
+import EmptyList from 'components/EmptyList';
 import { IRandomResponse } from './interfaces/randomResponse';
 import RandomResponseFormDialog from './RandomResponseFormDialog';
 import { useRandomResponseStore } from './store/useRandomResponseStore';
@@ -17,14 +17,18 @@ const RandomResponseList = () => {
   const handleClose = () => setIsOpen(false);
 
   const handleDelete = (id: number): void => {
-    Alert.alert('Delete', 'Are you sure you want to delete this category?', [
-      {
-        text: 'Cancel',
-        onPress: () => {},
-        style: 'cancel'
-      },
-      { text: 'OK', onPress: () => deleteRandomResponse(id) }
-    ]);
+    Alert.alert(
+      'Delete',
+      'Are you sure you want to delete this random response?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel'
+        },
+        { text: 'OK', onPress: () => deleteRandomResponse(id) }
+      ]
+    );
   };
 
   const handleClickEntry = (_entry: IRandomResponse) => {
@@ -46,7 +50,11 @@ const RandomResponseList = () => {
           />
         )}
         keyExtractor={item => String(item.id)}
-        ListEmptyComponent={<EmptyList />}
+        ListEmptyComponent={
+          <EmptyList>
+            <Text>No Data</Text>
+          </EmptyList>
+        }
       />
       <RandomResponseFormDialog
         isOpen={isOpen}

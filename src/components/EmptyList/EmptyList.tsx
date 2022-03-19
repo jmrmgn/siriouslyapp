@@ -2,12 +2,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import React from 'react';
 
-const EmptyList = () => {
-  return (
-    <View style={styles.container}>
-      <Text>No data</Text>
-    </View>
-  );
+interface IEmptyListProps {
+  children: React.ReactNode;
+}
+
+const EmptyList = (props: IEmptyListProps) => {
+  const { children } = props;
+  return <View style={styles.container}>{children}</View>;
 };
 
 const styles = StyleSheet.create({

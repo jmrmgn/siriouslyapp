@@ -7,19 +7,24 @@ import { persist } from 'zustand/middleware';
 export const useCategoryStore = create<ICategoryStore>(
   persist(
     (set, get) => ({
+      counter: 1,
       categories: [],
-      addCategory: (category: ICategory): void => {
+      getCategory: (id: number) => {
+        return get().categories.find(entry => Number(entry.id) === Number(id));
+      },
+      addCategory: (category: Omit<ICategory, 'id'>): void => {
         set(() => ({
-          categories: [...get().categories, category]
+          categories: [...get().categories, { ...category, id: get().counter }],
+          counter: get().counter + 1
         }));
       },
-      editCategory: (id: number, category: ICategory): void => {
+      updateCategory: (id: number, category: Omit<ICategory, 'id'>): void => {
         set(() => {
           const categories = [...get().categories];
           const categoryIdx = categories.findIndex(
             cat => Number(cat.id) === Number(id)
           );
-          categories[categoryIdx] = category;
+          categories[categoryIdx] = { ...categories[categoryIdx], ...category };
 
           return { categories };
         });
