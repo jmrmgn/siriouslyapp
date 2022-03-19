@@ -1,17 +1,21 @@
-import AsyncStorage, {
-  useAsyncStorage
-} from '@react-native-async-storage/async-storage';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Category as ICategory } from 'hooks/useCategories';
+import { ICategory } from 'screens/Category/interfaces/category';
+import { IRandomResponse } from 'screens/RandomResponse/interfaces/randomResponse';
 import { IconButton } from 'react-native-paper';
 import Tts from 'react-native-tts';
 import Voice from '@react-native-voice/voice';
 import { useAuthStore } from 'screens/SetupScreen/store/useAuthStore';
+import { useCategoryStore } from 'screens/Category/store/useCategoryStore';
+import { useRandomResponseStore } from 'screens/RandomResponse/store/useRandomResponseStore';
 
 // TODO: Move from the other
-const findPhrase = (sentence: string, categories: ICategory[]): string => {
+const findPhrase = (
+  sentence: string,
+  categories: ICategory[],
+  noResultPhrases: IRandomResponse[]
+): string => {
   /*
     - Get the sentence
     - split them by word and set all to lowercase
@@ -28,46 +32,47 @@ const findPhrase = (sentence: string, categories: ICategory[]): string => {
   const matchedWords: ICategory[] = [];
 
   categories.forEach(category => {
-    if (sentence.toLowerCase().indexOf(category.keyword.toLowerCase()) !== -1) {
-      matchedWords.push(category);
-    }
+    category.keywords.map(cat => {
+      if (sentence.toLowerCase().indexOf(cat.toLowerCase()) !== -1) {
+        matchedWords.push(category);
+      }
+    });
+    // if (sentence.toLowerCase().indexOf(category.keyword.toLowerCase()) !== -1) {
+    //   matchedWords.push(category);
+    // }
   });
 
   // Has matchedWords
   if (matchedWords.length > 0) {
-    phrase = matchedWords[0].phrase;
+    phrase = matchedWords[0].responses[0];
   } else {
     // TODO: Need to setup
     const randNum = Math.floor(Math.random() * noResultPhrases.length);
-    phrase = noResultPhrases[randNum];
+    phrase = (noResultPhrases[randNum] ?? []).message;
   }
 
   return phrase;
 };
-
-const noResultPhrases = [
-  "Please repeat your statement, I can't even understand",
-  'Hey, what is it again?!',
-  'Go get someone to talk to'
-];
 
 const HomeScreen = () => {
   const [command, setCommand] = useState('');
   const [response, setResponse] = useState('');
   const [isRecord, setIsRecord] = useState(false);
 
-  const { getItem } = useAsyncStorage('@Categories');
+  const { getCategories } = useCategoryStore(state => state);
+  const { randomResponses } = useRandomResponseStore(state => state);
 
   const handleStop = useCallback(
     async (_command: string) => {
       if (_command !== '') {
-        const categoriesData = await getItem();
-        let categories;
-        if (categoriesData) {
-          // If there are data, it's converted to an Object and the state is updated.
-          categories = JSON.parse(categoriesData);
-        }
-        const _response = findPhrase(_command, categories);
+        // const categoriesData = await getItem();
+        // let categories;
+        // if (categoriesData) {
+        //   // If there are data, it's converted to an Object and the state is updated.
+        //   categories = JSON.parse(categoriesData);
+        // }
+        const categories = getCategories();
+        const _response = findPhrase(_command, categories, randomResponses);
         setResponse(_response);
         setTimeout(() => {
           Tts.speak(_response);
@@ -76,16 +81,12 @@ const HomeScreen = () => {
 
       setIsRecord(false);
     },
-    [getItem]
+    [getCategories]
   );
-
-  const signOut = useAuthStore(state => state.signOut);
 
   useEffect(() => {
     // signOut();
-    const onSpeechStart = () => {
-      // console.log('# started');
-    };
+    const onSpeechStart = () => {};
 
     const onSpeechResults = (e: any) => {
       const _command = e.value[0];
@@ -96,12 +97,10 @@ const HomeScreen = () => {
     const onSpeechEnd = () => {
       Voice.stop();
       setIsRecord(false);
-      // console.log('# ended');
     };
 
     const onSpeechError = (e: any) => {
       setIsRecord(false);
-      // console.log(e);
     };
 
     Voice.onSpeechStart = onSpeechStart;
@@ -112,7 +111,6 @@ const HomeScreen = () => {
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleStart = () => {

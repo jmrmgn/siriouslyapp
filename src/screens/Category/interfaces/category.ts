@@ -1,5 +1,3 @@
-import { ICategoryFormFields } from './formFields';
-
 export interface ICategory {
   id: number;
   name: string;
@@ -10,6 +8,7 @@ export interface ICategory {
 export interface ICategoryStore {
   counter: number;
   categories: ICategory[];
+  getCategories: () => ICategory[];
   getCategory: (id: number) => ICategory | undefined;
   addCategory: (category: Omit<ICategory, 'id'>) => void;
   updateCategory: (id: number, category: Omit<ICategory, 'id'>) => void;

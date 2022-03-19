@@ -33,8 +33,6 @@ const SetupScreen = () => {
     } catch (error) {}
   };
 
-  console.log('_', _name.name);
-
   return (
     <View style={style.container}>
       <Text>What is your name?</Text>

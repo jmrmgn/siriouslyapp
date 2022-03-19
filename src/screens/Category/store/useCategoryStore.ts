@@ -9,6 +9,7 @@ export const useCategoryStore = create<ICategoryStore>(
     (set, get) => ({
       counter: 1,
       categories: [],
+      getCategories: () => get().categories,
       getCategory: (id: number) => {
         return get().categories.find(entry => Number(entry.id) === Number(id));
       },
