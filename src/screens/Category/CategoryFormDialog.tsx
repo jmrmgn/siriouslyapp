@@ -24,8 +24,12 @@ const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
   const isEdit = !!categoryId;
   const category = getCategory(categoryId!);
 
-  const categoryNames = categories.map(cat => cat.name.toLowerCase());
-  const keywordLists = categories.flatMap(cat => cat.keywords);
+  const categoryNames = categories
+    .filter(cat => cat.id !== categoryId)
+    .map(cat => cat.name.toLowerCase());
+  const keywordLists = categories
+    .filter(cat => cat.id !== categoryId)
+    .flatMap(cat => cat.keywords);
 
   const methods = useForm<ICategoryFormFields>({
     resolver: yupResolver(categorySchema(categoryNames, keywordLists))
