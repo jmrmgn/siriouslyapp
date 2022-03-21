@@ -18,15 +18,17 @@ interface ICategoryFormDialogProps extends IFormCoreProps {
 const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
   const { isOpen, onClose, categoryId } = props;
 
-  const { addCategory, getCategory, updateCategory } = useCategoryStore(
-    state => state
-  );
+  const { addCategory, getCategory, updateCategory, categories } =
+    useCategoryStore(state => state);
 
   const isEdit = !!categoryId;
   const category = getCategory(categoryId!);
 
+  const categoryNames = categories.map(cat => cat.name.toLowerCase());
+  const keywordLists = categories.flatMap(cat => cat.keywords);
+
   const methods = useForm<ICategoryFormFields>({
-    resolver: yupResolver(categorySchema)
+    resolver: yupResolver(categorySchema(categoryNames, keywordLists))
   });
   const { handleSubmit, reset } = methods;
 
