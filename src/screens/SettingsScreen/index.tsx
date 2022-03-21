@@ -12,6 +12,7 @@ import useCategories, { Category as CategoryProp } from 'hooks/useCategories';
 
 import Configuration from './Configuration';
 import { ItemHeader } from 'components/common';
+import useAuthContext from 'hooks/useAuthContext';
 import { useAuthStore } from 'screens/SetupScreen/store/useAuthStore';
 
 type InputGroupProps = React.ComponentProps<typeof TextInput> & {
@@ -30,11 +31,12 @@ const InputGroup: React.FC<InputGroupProps> = props => {
 };
 
 const NameField: React.FC = () => {
-  const _name = useAuthStore(state => state.name);
-  const signIn = useAuthStore(state => state.signIn);
+  // const _name = useAuthStore(state => state.name);
+  // const signIn = useAuthStore(state => state.signIn);
+  const { authData, signIn } = useAuthContext();
 
   const [showDialog, setShowDialog] = useState(false);
-  const [name, setName] = useState<string>(_name ?? '');
+  const [name, setName] = useState<string>(authData?.name ?? '');
 
   const handleChangeName = () => {
     signIn(name);
@@ -80,7 +82,7 @@ const NameField: React.FC = () => {
         onClickAction={() => setShowDialog(true)}
       />
       <List.Item
-        title={_name}
+        title={authData?.name}
         description="Name"
         titleStyle={style.title}
         descriptionStyle={style.description}

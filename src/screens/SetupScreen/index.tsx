@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import Tts from 'react-native-tts';
-import { useAuthStore } from './store/useAuthStore';
+import useAuthContext from 'hooks/useAuthContext';
 
-Tts.setDefaultLanguage('en-US');
+interface Props {}
 
-const SetupScreen = () => {
+const SetupScreen: React.FC<Props> = () => {
   const [name, setName] = useState('');
   const [errorMessage, setErrorMessage] = useState<string>();
 
-  const signIn = useAuthStore(state => state.signIn);
+  const auth = useAuthContext();
 
   useEffect(() => {
     init();
@@ -21,14 +21,14 @@ const SetupScreen = () => {
     Tts.speak('What is your name?');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
       if (!name || name === '') {
         setErrorMessage('Name is required');
         return;
       }
 
-      signIn(name);
+      await auth.signIn(name);
     } catch (error) {}
   };
 
