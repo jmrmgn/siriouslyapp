@@ -6,7 +6,6 @@ import { IRandomResponse } from 'screens/RandomResponse/interfaces/randomRespons
 import { IconButton } from 'react-native-paper';
 import Tts from 'react-native-tts';
 import Voice from '@react-native-voice/voice';
-import { useAuthStore } from 'screens/SetupScreen/store/useAuthStore';
 import { useCategoryStore } from 'screens/Category/store/useCategoryStore';
 import { useRandomResponseStore } from 'screens/RandomResponse/store/useRandomResponseStore';
 
@@ -37,9 +36,6 @@ const findPhrase = (
         matchedWords.push(category);
       }
     });
-    // if (sentence.toLowerCase().indexOf(category.keyword.toLowerCase()) !== -1) {
-    //   matchedWords.push(category);
-    // }
   });
 
   // Has matchedWords
@@ -56,26 +52,19 @@ const findPhrase = (
 
 const HomeScreen = () => {
   const [command, setCommand] = useState('');
-  const [response, setResponse] = useState('');
   const [isRecord, setIsRecord] = useState(false);
 
   const { getCategories } = useCategoryStore(state => state);
-  const { randomResponses } = useRandomResponseStore(state => state);
+  const { getRandomResponses } = useRandomResponseStore(state => state);
 
   const handleStop = useCallback(
-    async (_command: string) => {
+    (_command: string) => {
       if (_command !== '') {
-        // const categoriesData = await getItem();
-        // let categories;
-        // if (categoriesData) {
-        //   // If there are data, it's converted to an Object and the state is updated.
-        //   categories = JSON.parse(categoriesData);
-        // }
         const categories = getCategories();
-        const _response = findPhrase(_command, categories, randomResponses);
-        setResponse(_response);
+        const randomResponses = getRandomResponses();
+        const response = findPhrase(_command, categories, randomResponses);
         setTimeout(() => {
-          Tts.speak(_response);
+          Tts.speak(response);
         }, 500);
       }
 
@@ -85,7 +74,6 @@ const HomeScreen = () => {
   );
 
   useEffect(() => {
-    // signOut();
     const onSpeechStart = () => {};
 
     const onSpeechResults = (e: any) => {
@@ -126,7 +114,6 @@ const HomeScreen = () => {
   return (
     <View style={style.container}>
       {command ? <Text style={style.commandTxt}>{`"${command}"`}</Text> : null}
-      {/* <Text>Response: {response}</Text> */}
       <IconButton
         style={style.micButton}
         icon={icon}

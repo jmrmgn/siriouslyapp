@@ -59,7 +59,6 @@ const useVoiceRecognition = () => {
     // setPartialResults([]);
     // setEnd('');
     try {
-      console.log('Started');
       await Voice.start('en-US');
     } catch (e) {
       // console.error(e);
@@ -105,7 +104,7 @@ const useVoiceRecognition = () => {
     results,
     // partialResults,
     onStartRecognizing,
-    onStopRecognizing,
+    onStopRecognizing
     // onCancelRecognizing,
     // onDestroyRecognizer,
   };

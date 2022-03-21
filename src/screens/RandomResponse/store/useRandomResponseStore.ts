@@ -1,23 +1,21 @@
-import {
-  IRandomResponse,
-  IRandomResponseStore
-} from '../interfaces/randomResponse';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { IRandomResponseStore } from '../interfaces/randomResponse';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
-
-const defaultRandRes: IRandomResponse[] = [
-  { id: 1, message: "Please repeat your statement, I can't even understand" },
-  { id: 2, message: 'Hey, what is it again?!' },
-  { id: 3, message: 'Go get someone to talk to' }
-];
 
 export const useRandomResponseStore = create<IRandomResponseStore>(
   persist(
     (set, get) => ({
       counter: 4,
-      randomResponses: defaultRandRes,
+      randomResponses: [
+        {
+          id: 1,
+          message: "Please repeat your statement, I can't even understand"
+        },
+        { id: 2, message: 'Hey, what is it again?!' },
+        { id: 3, message: 'Go get someone to talk to' }
+      ],
+      getRandomResponses: () => get().randomResponses,
       getRandomResponse: (id: number) =>
         get().randomResponses.find(entry => Number(entry.id) === Number(id)),
       addRandomResponse: (message: string): void => {
@@ -46,7 +44,7 @@ export const useRandomResponseStore = create<IRandomResponseStore>(
       deleteRandomResponse: (id: number): void => {
         set(() => ({
           randomResponses: get().randomResponses.filter(
-            randRes => Number(randRes.id) !== id
+            randRes => Number(randRes.id) !== Number(id)
           )
         }));
       }

@@ -16,19 +16,26 @@ const RandomResponseList = () => {
 
   const handleClose = () => setIsOpen(false);
 
+  const handlePressDelete = (id: number): void => {
+    if (randomResponses.length > 3) {
+      return deleteRandomResponse(id);
+    }
+
+    Alert.alert('Information', 'Entries should be at least three(3).');
+  };
+
   const handleDelete = (id: number): void => {
-    Alert.alert(
-      'Delete',
-      'Are you sure you want to delete this random response?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => {},
-          style: 'cancel'
-        },
-        { text: 'OK', onPress: () => deleteRandomResponse(id) }
-      ]
-    );
+    Alert.alert('Delete', 'Are you sure you want to delete this entry?', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel'
+      },
+      {
+        text: 'OK',
+        onPress: () => handlePressDelete(id)
+      }
+    ]);
   };
 
   const handleClickEntry = (_entry: IRandomResponse) => {
