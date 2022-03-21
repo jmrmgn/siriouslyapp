@@ -12,7 +12,6 @@ const SetupScreen = () => {
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const signIn = useAuthStore(state => state.signIn);
-  const _name = useAuthStore();
 
   useEffect(() => {
     init();
