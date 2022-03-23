@@ -1,17 +1,20 @@
 import CategoriesScreen from 'screens/Category/CategoriesScreen';
-import { EAppScreen } from './enums';
+import { EAppScreen } from 'routes/App/enums';
 import HomeScreen from '@/screens/HomeScreen';
 import Navbar from '@/components/layouts/Navbar';
 import RandomResponsesScreen from 'screens/RandomResponse/RandomResponsesScreen';
 import React from 'react';
 import SettingsScreen from '@/screens/SettingsScreen';
+import { TAppStackParamList } from './types';
 import { createStackNavigator } from '@react-navigation/stack';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<TAppStackParamList>();
 
-const AppStack: React.FC = () => {
+const AppStack = () => {
   return (
     <Stack.Navigator
+      initialRouteName={EAppScreen.Home}
+      // TODO: Any
       screenOptions={{ header: (props: any) => <Navbar {...props} /> }}
     >
       <Stack.Screen

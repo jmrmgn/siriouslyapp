@@ -1,18 +1,20 @@
+import { TAppNavProps, TAppRouteProps } from 'routes/App/types';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { Appbar } from 'react-native-paper';
+import { EAppScreen } from 'routes/App/enums';
 import React from 'react';
-
-interface Props {
-  back?: any;
-}
 
 const HEADER_TITLE = 'Siriously';
 
-const Navbar: React.FC<Props> = props => {
+export interface INavBarProps {
+  back?: boolean;
+}
+
+const Navbar = (props: INavBarProps) => {
   const { back } = props;
-  const navigation = useNavigation<any>();
-  const route: any = useRoute();
+  const navigation = useNavigation<TAppNavProps>();
+  const route = useRoute<TAppRouteProps<EAppScreen.Home>>();
 
   const isMainPage = route?.params?.isMain;
   const headerTitle = route?.params?.headerTitle ?? route?.name;
@@ -24,7 +26,7 @@ const Navbar: React.FC<Props> = props => {
       {isMainPage && (
         <Appbar.Action
           icon="dots-vertical"
-          onPress={() => navigation.push('Settings')}
+          onPress={() => navigation.push(EAppScreen.Settings)}
         />
       )}
     </Appbar.Header>

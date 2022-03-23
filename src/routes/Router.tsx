@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
 // Route Stacks
-import AppStack from './AppStack';
-import AuthStack from './AuthStack';
+import AppStack from './App/AppStack';
+import AuthStack from './Auth/AuthStack';
 import { NavigationContainer } from '@react-navigation/native';
+import React from 'react';
 import useAuthContext from 'hooks/useAuthContext';
 
 export const Router = () => {
