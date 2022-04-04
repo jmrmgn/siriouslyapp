@@ -3,14 +3,18 @@ import { Chip, List, Text } from 'react-native-paper';
 import React, { useState } from 'react';
 
 import CategoryFormDialog from './CategoryFormDialog';
+import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
 import { ICategory } from './interfaces/category';
+import { TAppNavProps } from 'routes/App/types';
 import { useCategoryStore } from './store/useCategoryStore';
+import { useNavigation } from '@react-navigation/native';
 
 const CategoryList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [category, setCategory] = useState<ICategory>();
   const { categories, deleteCategory } = useCategoryStore(state => state);
+  const navigation = useNavigation<TAppNavProps>();
 
   const handleClose = () => setIsOpen(false);
 
@@ -25,9 +29,13 @@ const CategoryList = () => {
     ]);
   };
 
-  const handleClickEntry = (_category: ICategory) => {
-    setIsOpen(true);
-    setCategory(_category);
+  // const handleClickEntry = (_category: ICategory) => {
+  //   setIsOpen(true);
+  //   setCategory(_category);
+  // };
+
+  const handleClickCategory = (entry: ICategory) => {
+    navigation.push(EAppScreen.Keywords, { headerTitle: entry.name });
   };
 
   return (
@@ -36,28 +44,13 @@ const CategoryList = () => {
         data={categories}
         renderItem={({ item: entry }) => {
           return (
-            <>
-              <List.Section>
-                <List.Item
-                  key={entry.id}
-                  titleNumberOfLines={3}
-                  title={entry.name}
-                  description={entry.responses}
-                  descriptionNumberOfLines={3}
-                  onPress={() => handleClickEntry(entry)}
-                  onLongPress={() => handleDelete(entry.id)}
-                />
-                {(entry.keywords ?? []).length > 0 && (
-                  <View style={styles.chipContainer}>
-                    {(entry.keywords ?? []).map((_entry, index: number) => (
-                      <Chip key={index} style={styles.chip}>
-                        {_entry}
-                      </Chip>
-                    ))}
-                  </View>
-                )}
-              </List.Section>
-            </>
+            <List.Item
+              key={entry.id}
+              titleNumberOfLines={3}
+              title={entry.name}
+              onPress={() => handleClickCategory(entry)}
+              onLongPress={() => handleDelete(entry.id)}
+            />
           );
         }}
         keyExtractor={item => String(item.id)}

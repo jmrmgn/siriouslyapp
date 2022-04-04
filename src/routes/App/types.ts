@@ -7,6 +7,7 @@ export type TAppStackParamList = {
   [EAppScreen.Home]: { isMain: boolean; headerTitle: string };
   [EAppScreen.Settings]: undefined;
   [EAppScreen.Categories]: undefined;
+  [EAppScreen.Keywords]: { headerTitle: string };
   [EAppScreen.RandomResponses]: undefined;
 };
 

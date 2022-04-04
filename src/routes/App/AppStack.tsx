@@ -1,6 +1,7 @@
 import CategoriesScreen from 'screens/Category/CategoriesScreen';
 import { EAppScreen } from 'routes/App/enums';
 import HomeScreen from '@/screens/HomeScreen';
+import KeywordScreen from 'screens/Keyword/KeywordScreen';
 import Navbar from '@/components/layouts/Navbar';
 import RandomResponsesScreen from 'screens/RandomResponse/RandomResponsesScreen';
 import React from 'react';
@@ -24,6 +25,7 @@ const AppStack = () => {
       />
       <Stack.Screen name={EAppScreen.Settings} component={SettingsScreen} />
       <Stack.Screen name={EAppScreen.Categories} component={CategoriesScreen} />
+      <Stack.Screen name={EAppScreen.Keywords} component={KeywordScreen} />
       <Stack.Screen
         name={EAppScreen.RandomResponses}
         component={RandomResponsesScreen}

@@ -52,6 +52,7 @@ const RandomResponseList = () => {
             key={entry.id}
             titleNumberOfLines={3}
             title={entry.message}
+            titleStyle={{ fontStyle: 'italic' }}
             onPress={() => handleClickEntry(entry)}
             onLongPress={() => handleDelete(entry.id)}
           />
