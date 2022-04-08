@@ -4,25 +4,24 @@ import React, { useEffect } from 'react';
 import { Button } from 'react-native-paper';
 import FormDialog from 'components/FormDialog';
 import { IFormCoreProps } from 'interfaces/form';
+import { IRandomResponse } from './interfaces/randomResponse';
 import { IRandomResponseFormFields } from './interfaces/formFields';
 import RandomResponseForm from './RandomResponseForm';
 import { StyleSheet } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 import { randomResponseSchema } from './schemas/randomResponse';
-import { useRandomResponseStore } from './store/useRandomResponseStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 interface IRandomResponseFormDialogProps extends IFormCoreProps {
-  randomResponseId?: number;
+  // TODO: ANY
+  randomResponse?: IRandomResponse;
 }
 
 const RandomResponseFormDialog = (props: IRandomResponseFormDialogProps) => {
-  const { isOpen, onClose, randomResponseId } = props;
+  const { isOpen, onClose, randomResponse } = props;
+  const ref = firestore().collection('randomResponses');
 
-  const { addRandomResponse, getRandomResponse, updateRandomResponse } =
-    useRandomResponseStore(state => state);
-
-  const isEdit = !!randomResponseId;
-  const randomResponse = getRandomResponse(randomResponseId!);
+  const isEdit = !!randomResponse;
 
   const methods = useForm<IRandomResponseFormFields>({
     resolver: yupResolver(randomResponseSchema)
@@ -36,13 +35,22 @@ const RandomResponseFormDialog = (props: IRandomResponseFormDialogProps) => {
   };
 
   const handleAdd = (data: IRandomResponseFormFields): void => {
-    addRandomResponse(data.message);
+    // addRandomResponse(data.message);
+    // TODO: Refactor and remove console
+    ref.add({ message: data.message, createdAt: new Date() }).then(() => {});
     handleSuccess();
   };
 
   const handleUpdate = (data: IRandomResponseFormFields): void => {
-    if (randomResponseId) {
-      updateRandomResponse(randomResponseId, data.message);
+    if (randomResponse) {
+      // TODO: Refactor any
+      // updateRandomResponse(randomResponse.id as any, data.message);
+      ref
+        .doc(randomResponse.id)
+        .update({
+          message: data.message
+        })
+        .then(() => {});
       handleSuccess();
     }
   };

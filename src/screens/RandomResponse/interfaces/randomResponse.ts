@@ -1,5 +1,5 @@
 export interface IRandomResponse {
-  id: number;
+  id: string;
   message: string;
 }
 

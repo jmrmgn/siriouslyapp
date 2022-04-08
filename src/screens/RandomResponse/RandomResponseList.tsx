@@ -1,30 +1,32 @@
 import { Alert, FlatList } from 'react-native';
 import { List, Text } from 'react-native-paper';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import EmptyList from 'components/EmptyList';
 import { IRandomResponse } from './interfaces/randomResponse';
 import RandomResponseFormDialog from './RandomResponseFormDialog';
-import { useRandomResponseStore } from './store/useRandomResponseStore';
+import firestore from '@react-native-firebase/firestore';
 
 const RandomResponseList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [entry, setEntry] = useState<IRandomResponse>();
-  const { randomResponses, deleteRandomResponse } = useRandomResponseStore(
-    state => state
-  );
+  const [randomResponses, setRandomResponses] = useState<IRandomResponse[]>([]);
+  const ref = firestore().collection('randomResponses');
 
   const handleClose = () => setIsOpen(false);
 
-  const handlePressDelete = (id: number): void => {
+  const handlePressDelete = (id: string): void => {
     if (randomResponses.length > 3) {
-      return deleteRandomResponse(id);
+      ref
+        .doc(id)
+        .delete()
+        .then(() => {});
+      return;
     }
-
     Alert.alert('Information', 'Entries should be at least three(3).');
   };
 
-  const handleDelete = (id: number): void => {
+  const handleDelete = (id: string): void => {
     Alert.alert('Delete', 'Are you sure you want to delete this entry?', [
       {
         text: 'Cancel',
@@ -43,18 +45,33 @@ const RandomResponseList = () => {
     setEntry(_entry);
   };
 
+  useEffect(() => {
+    return ref.orderBy('createdAt', 'asc').onSnapshot(querySnapshot => {
+      const entries: IRandomResponse[] = [];
+      querySnapshot.forEach(doc => {
+        const { message } = doc.data();
+        entries.push({
+          id: doc.id,
+          message
+        });
+      });
+
+      setRandomResponses(entries);
+    });
+  }, []);
+
   return (
     <>
       <FlatList
         data={randomResponses}
-        renderItem={({ item: entry }) => (
+        renderItem={({ item }) => (
           <List.Item
-            key={entry.id}
+            key={item.id}
             titleNumberOfLines={3}
-            title={entry.message}
+            title={item.message}
             titleStyle={{ fontStyle: 'italic' }}
-            onPress={() => handleClickEntry(entry)}
-            onLongPress={() => handleDelete(entry.id)}
+            onPress={() => handleClickEntry(item)}
+            onLongPress={() => handleDelete(item.id)}
           />
         )}
         keyExtractor={item => String(item.id)}
@@ -67,7 +84,8 @@ const RandomResponseList = () => {
       <RandomResponseFormDialog
         isOpen={isOpen}
         onClose={handleClose}
-        randomResponseId={entry?.id}
+        // randomResponseId={entry?.id}
+        randomResponse={entry}
       />
     </>
   );
