@@ -2,23 +2,30 @@ import { FormProvider, useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
 import { Button } from 'react-native-paper';
+import { EAppScreen } from 'routes/App/enums';
 import FormDialog from 'components/FormDialog';
 import { IFormCoreProps } from 'interfaces/form';
 import KeywordForm from './KeywordForm';
 import { StyleSheet } from 'react-native';
+import { TAppRouteProps } from 'routes/App/types';
 import { TKeywordFormFields } from './interfaces/keyword';
+import firestore from '@react-native-firebase/firestore';
 import { keywordSchema } from './schemas/keyword';
+import { useRoute } from '@react-navigation/native';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 interface IKeywordFormDialogProps extends IFormCoreProps {
   keywordId?: number;
+  keyword?: any;
 }
 
 const KeywordFormDialog = (props: IKeywordFormDialogProps) => {
-  const { isOpen, onClose, keywordId } = props;
+  const { isOpen, onClose, keyword } = props;
+  const keywordsRef = firestore().collection('keywords');
+  const route = useRoute<TAppRouteProps<EAppScreen.Keywords>>();
+  const categoryId = route.params.categoryId;
 
-  const isEdit = !!keywordId;
-  const randomResponse = {};
+  const isEdit = !!keyword;
 
   const methods = useForm<TKeywordFormFields>({
     resolver: yupResolver(keywordSchema())
@@ -32,14 +39,36 @@ const KeywordFormDialog = (props: IKeywordFormDialogProps) => {
   };
 
   const handleAdd = (data: TKeywordFormFields): void => {
-    // TODO: Add
+    keywordsRef
+      .add({
+        name: data.name,
+        response: data.response,
+        categoryId,
+        createdAt: new Date()
+      })
+      .then(() => {});
+    handleSuccess();
   };
 
   const handleUpdate = (data: TKeywordFormFields): void => {
-    if (keywordId) {
-      // TODO: Update
+    if (keyword) {
+      keywordsRef
+        .doc(keyword.id)
+        .update({
+          name: data.name,
+          response: data.response
+        })
+        .then(() => {});
+      handleSuccess();
     }
   };
+
+  // Pre-fill the form
+  useEffect(() => {
+    if (keyword) {
+      reset({ ...keyword });
+    }
+  }, [keyword]);
 
   const title = isEdit ? 'Edit' : 'New';
   const actionTitle = isEdit ? 'Update' : 'Add';

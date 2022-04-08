@@ -4,35 +4,30 @@ import React, { useEffect } from 'react';
 import { Button } from 'react-native-paper';
 import CategoryForm from './CategoryForm';
 import FormDialog from 'components/FormDialog';
+import { ICategory } from './interfaces/category';
 import { ICategoryFormFields } from './interfaces/formFields';
 import { IFormCoreProps } from 'interfaces/form';
 import { StyleSheet } from 'react-native';
 import { categorySchema } from './schemas/category';
+import firestore from '@react-native-firebase/firestore';
 import { useCategoryStore } from './store/useCategoryStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 interface ICategoryFormDialogProps extends IFormCoreProps {
   categoryId?: number;
+  category?: any; // TODO: any
 }
 
 const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
-  const { isOpen, onClose, categoryId } = props;
+  const { isOpen, onClose, categoryId, category } = props;
+  const categoriesRef = firestore().collection('categories');
 
-  const { addCategory, getCategory, updateCategory, categories } =
-    useCategoryStore(state => state);
+  const { updateCategory } = useCategoryStore(state => state);
 
-  const isEdit = !!categoryId;
-  const category = getCategory(categoryId!);
-
-  const categoryNames = categories
-    .filter(cat => cat.id !== categoryId)
-    .map(cat => cat.name.toLowerCase());
-  const keywordLists = categories
-    .filter(cat => cat.id !== categoryId)
-    .flatMap(cat => cat.keywords);
+  const isEdit = !!category;
 
   const methods = useForm<ICategoryFormFields>({
-    resolver: yupResolver(categorySchema(categoryNames, keywordLists))
+    resolver: yupResolver(categorySchema())
   });
   const { handleSubmit, reset } = methods;
 
@@ -42,17 +37,13 @@ const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
   };
 
   const handleAdd = (data: ICategoryFormFields) => {
-    addCategory({ ...data, responses: [data.responses] });
+    categoriesRef.add({ name: data.name, createdAt: new Date() });
     handleSuccess();
   };
 
   const handleUpdate = (data: ICategoryFormFields) => {
-    if (categoryId) {
-      updateCategory(categoryId, {
-        name: data.name,
-        keywords: data.keywords,
-        responses: [data.responses]
-      });
+    if (category) {
+      categoriesRef.doc(category.id).update({ name: data.name });
       handleSuccess();
     }
   };

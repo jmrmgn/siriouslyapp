@@ -1,47 +1,105 @@
+import { Alert, FlatList } from 'react-native';
 import { List, Text } from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
 
+import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
-import { FlatList } from 'react-native';
 import { IKeyword } from './interfaces/keyword';
-import React from 'react';
+import KeywordFormDialog from './KeywordFormDialog';
+import { TAppRouteProps } from 'routes/App/types';
+import firestore from '@react-native-firebase/firestore';
+import { useRoute } from '@react-navigation/native';
 
 const KeywordList = () => {
-  const keywords: IKeyword[] = [
-    { id: 1, name: 'Steak', response: 'Lorem ipsum sit amet dolor' },
-    { id: 2, name: 'Chips', response: 'That’s a lot of sodium mate!' }
-  ];
+  const [isOpen, setIsOpen] = useState(false);
+  const [entry, setEntry] = useState<any>();
+  const [keywords, setKeywords] = useState<any[]>([]);
+  const route = useRoute<TAppRouteProps<EAppScreen.Keywords>>();
+  const categoryId = route.params.categoryId;
+  const keywordsRef = firestore().collection('keywords');
 
-  const handleClick = () => {
-    // TODO: Long Press
+  const handleClose = () => setIsOpen(false);
+
+  const handleClick = (_entry: any) => {
+    setIsOpen(true);
+
+    setEntry(entry);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (id: string) => {
     // TODO: Delete
+    Alert.alert('Delete', 'Are you sure you want to delete this entry?', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel'
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          keywordsRef
+            .doc(id)
+            .delete()
+            .then(() => {});
+        }
+      }
+    ]);
   };
+
+  const getData = () => {
+    keywordsRef
+      .where('categoryId', '==', categoryId)
+      .orderBy('createdAt', 'asc')
+      .onSnapshot(querySnapshot => {
+        const entries: any[] = [];
+        querySnapshot.forEach(doc => {
+          const { name, response } = doc.data();
+          entries.push({
+            id: doc.id,
+            name,
+            response
+          });
+        });
+
+        setKeywords(entries);
+      });
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
-    <FlatList
-      data={keywords}
-      renderItem={({ item: entry }) => {
-        return (
-          <List.Item
-            key={entry.id}
-            title={entry.name}
-            description={entry.response}
-            descriptionNumberOfLines={3}
-            descriptionStyle={{ fontStyle: 'italic' }}
-            onPress={() => handleClick()}
-            onLongPress={() => handleDelete()}
-          />
-        );
-      }}
-      keyExtractor={item => String(item.id)}
-      ListEmptyComponent={
-        <EmptyList>
-          <Text>No Data</Text>
-        </EmptyList>
-      }
-    />
+    <>
+      <FlatList
+        data={keywords}
+        renderItem={({ item: entry }) => {
+          return (
+            <List.Item
+              key={entry.id}
+              title={entry.name}
+              description={entry.response}
+              descriptionNumberOfLines={3}
+              descriptionStyle={{ fontStyle: 'italic' }}
+              onPress={() => handleClick(entry)}
+              onLongPress={() => handleDelete(entry.id)}
+            />
+          );
+        }}
+        keyExtractor={item => String(item.id)}
+        ListEmptyComponent={
+          <EmptyList>
+            <Text>No Data</Text>
+          </EmptyList>
+        }
+      />
+      <KeywordFormDialog
+        isOpen={isOpen}
+        onClose={handleClose}
+        // randomResponseId={entry?.id}
+        keyword={entry}
+      />
+    </>
   );
 };
 

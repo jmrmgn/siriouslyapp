@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import CategoryFormDialog2 from './CategoryFormDialog2';
+import CategoryFormDialog from './CategoryFormDialog';
 import CategoryList from './CategoryList';
 import { FAB } from 'components/FAB';
 
@@ -13,7 +13,7 @@ const CategoriesScreen = () => {
     <>
       <CategoryList />
       <FAB onPress={() => setIsOpen(true)} />
-      {isOpen && <CategoryFormDialog2 isOpen={isOpen} onClose={handleClose} />}
+      {isOpen && <CategoryFormDialog isOpen={isOpen} onClose={handleClose} />}
     </>
   );
 };

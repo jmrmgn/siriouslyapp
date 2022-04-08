@@ -1,20 +1,23 @@
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { Chip, List, Text } from 'react-native-paper';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import CategoryFormDialog from './CategoryFormDialog';
 import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
 import { ICategory } from './interfaces/category';
 import { TAppNavProps } from 'routes/App/types';
+import firestore from '@react-native-firebase/firestore';
 import { useCategoryStore } from './store/useCategoryStore';
 import { useNavigation } from '@react-navigation/native';
 
 const CategoryList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [category, setCategory] = useState<ICategory>();
-  const { categories, deleteCategory } = useCategoryStore(state => state);
+  const [categories, setCategories] = useState<any[]>([]);
+  const { deleteCategory } = useCategoryStore(state => state);
   const navigation = useNavigation<TAppNavProps>();
+  const categoriesRef = firestore().collection('categories');
 
   const handleClose = () => setIsOpen(false);
 
@@ -34,9 +37,29 @@ const CategoryList = () => {
   //   setCategory(_category);
   // };
 
-  const handleClickCategory = (entry: ICategory) => {
-    navigation.push(EAppScreen.Keywords, { headerTitle: entry.name });
+  const handleClickCategory = (entry: any) => {
+    navigation.push(EAppScreen.Keywords, {
+      headerTitle: entry.name,
+      categoryId: entry.id
+    });
   };
+
+  useEffect(() => {
+    return categoriesRef
+      .orderBy('createdAt', 'asc')
+      .onSnapshot(querySnapshot => {
+        const entries: any[] = [];
+        querySnapshot.forEach(doc => {
+          const { name } = doc.data();
+          entries.push({
+            id: doc.id,
+            name
+          });
+        });
+
+        setCategories(entries);
+      });
+  }, []);
 
   return (
     <>
@@ -63,7 +86,7 @@ const CategoryList = () => {
       <CategoryFormDialog
         isOpen={isOpen}
         onClose={handleClose}
-        categoryId={category?.id}
+        category={category}
       />
     </>
   );
