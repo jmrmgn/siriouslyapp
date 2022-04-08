@@ -6,6 +6,7 @@ import { IRandomResponse } from 'screens/RandomResponse/interfaces/randomRespons
 import { IconButton } from 'react-native-paper';
 import Tts from 'react-native-tts';
 import Voice from '@react-native-voice/voice';
+import useAuthContext from 'hooks/useAuthContext';
 import { useCategoryStore } from 'screens/Category/store/useCategoryStore';
 import { useRandomResponseStore } from 'screens/RandomResponse/store/useRandomResponseStore';
 
@@ -53,6 +54,7 @@ const findPhrase = (
 const HomeScreen = () => {
   const [command, setCommand] = useState('');
   const [isRecord, setIsRecord] = useState(false);
+  const { signOut } = useAuthContext();
 
   const { getCategories } = useCategoryStore(state => state);
   const { getRandomResponses } = useRandomResponseStore(state => state);
@@ -74,6 +76,7 @@ const HomeScreen = () => {
   );
 
   useEffect(() => {
+    // signOut();
     const onSpeechStart = () => {};
 
     const onSpeechResults = (e: any) => {

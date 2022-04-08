@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import Tts from 'react-native-tts';
+import firestore from '@react-native-firebase/firestore';
+import { getUniqueId } from 'react-native-device-info';
 import useAuthContext from 'hooks/useAuthContext';
 
 interface Props {}
@@ -10,6 +12,7 @@ interface Props {}
 const SetupScreen: React.FC<Props> = () => {
   const [name, setName] = useState('');
   const [errorMessage, setErrorMessage] = useState<string>();
+  const usersRef = firestore().collection('users');
 
   const auth = useAuthContext();
 
@@ -28,7 +31,10 @@ const SetupScreen: React.FC<Props> = () => {
         return;
       }
 
-      await auth.signIn(name);
+      // TODO: Add validation if the uniqueId exist
+      const data = { name, uniqueId: getUniqueId(), createdAt: new Date() };
+      await auth.signIn(data);
+      usersRef.add(data);
     } catch (error) {}
   };
 
