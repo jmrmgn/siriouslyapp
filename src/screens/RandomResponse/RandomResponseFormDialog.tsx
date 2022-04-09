@@ -10,6 +10,7 @@ import RandomResponseForm from './RandomResponseForm';
 import { StyleSheet } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { randomResponseSchema } from './schemas/randomResponse';
+import useAuthContext from 'hooks/useAuthContext';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 interface IRandomResponseFormDialogProps extends IFormCoreProps {
@@ -19,7 +20,8 @@ interface IRandomResponseFormDialogProps extends IFormCoreProps {
 
 const RandomResponseFormDialog = (props: IRandomResponseFormDialogProps) => {
   const { isOpen, onClose, randomResponse } = props;
-  const ref = firestore().collection('randomResponses');
+  const randResponseRef = firestore().collection('randomResponses');
+  const { authData } = useAuthContext();
 
   const isEdit = !!randomResponse;
 
@@ -37,7 +39,13 @@ const RandomResponseFormDialog = (props: IRandomResponseFormDialogProps) => {
   const handleAdd = (data: IRandomResponseFormFields): void => {
     // addRandomResponse(data.message);
     // TODO: Refactor and remove console
-    ref.add({ message: data.message, createdAt: new Date() }).then(() => {});
+    randResponseRef
+      .add({
+        message: data.message,
+        userId: authData.uniqueId,
+        createdAt: new Date()
+      })
+      .then(() => {});
     handleSuccess();
   };
 
@@ -45,7 +53,7 @@ const RandomResponseFormDialog = (props: IRandomResponseFormDialogProps) => {
     if (randomResponse) {
       // TODO: Refactor any
       // updateRandomResponse(randomResponse.id as any, data.message);
-      ref
+      randResponseRef
         .doc(randomResponse.id)
         .update({
           message: data.message

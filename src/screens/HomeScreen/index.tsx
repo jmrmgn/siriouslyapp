@@ -1,20 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { ICategory } from 'screens/Category/interfaces/category';
-import { IRandomResponse } from 'screens/RandomResponse/interfaces/randomResponse';
 import { IconButton } from 'react-native-paper';
 import Tts from 'react-native-tts';
 import Voice from '@react-native-voice/voice';
-import useAuthContext from 'hooks/useAuthContext';
-import { useCategoryStore } from 'screens/Category/store/useCategoryStore';
+import firestore from '@react-native-firebase/firestore';
+import { getUniqueId } from 'react-native-device-info';
 import { useRandomResponseStore } from 'screens/RandomResponse/store/useRandomResponseStore';
 
 // TODO: Move from the other
 const findPhrase = (
   sentence: string,
-  categories: ICategory[],
-  noResultPhrases: IRandomResponse[]
+  keywords: any[],
+  noResultPhrases: any[]
 ): string => {
   /*
     - Get the sentence
@@ -29,19 +27,19 @@ const findPhrase = (
       - get the first keyword from matchedWords array and return the phrase
   */
   let phrase;
-  const matchedWords: ICategory[] = [];
+  const matchedWords: any[] = [];
 
-  categories.forEach(category => {
-    category.keywords.map(cat => {
-      if (sentence.toLowerCase().indexOf(cat.toLowerCase()) !== -1) {
-        matchedWords.push(category);
-      }
-    });
+  keywords.forEach(keyword => {
+    const key = keyword.name;
+    const keyResponse = keyword.response;
+    if (sentence.toLowerCase().indexOf(key.toLowerCase()) !== -1) {
+      matchedWords.push(keyResponse);
+    }
   });
 
   // Has matchedWords
   if (matchedWords.length > 0) {
-    phrase = matchedWords[0].responses[0];
+    phrase = matchedWords[0];
   } else {
     // TODO: Need to setup
     const randNum = Math.floor(Math.random() * noResultPhrases.length);
@@ -54,26 +52,83 @@ const findPhrase = (
 const HomeScreen = () => {
   const [command, setCommand] = useState('');
   const [isRecord, setIsRecord] = useState(false);
-  const { signOut } = useAuthContext();
+  const [userData, setUserData] = useState<any>({});
+  // const { signOut } = useAuthContext();
+  const usersRef = firestore().collection('users');
+  const keywordsRef = firestore().collection('keywords');
+  const randomResponsesRef = firestore().collection('randomResponses');
 
-  const { getCategories } = useCategoryStore(state => state);
+  // const { getCategories } = useCategoryStore(state => state);
   const { getRandomResponses } = useRandomResponseStore(state => state);
 
-  const handleStop = useCallback(
-    (_command: string) => {
-      if (_command !== '') {
-        const categories = getCategories();
-        const randomResponses = getRandomResponses();
-        const response = findPhrase(_command, categories, randomResponses);
-        setTimeout(() => {
-          Tts.speak(response);
-        }, 500);
-      }
+  const handleStop = useCallback(async (_command: string) => {
+    if (_command !== '') {
+      const randRes = await randomResponsesRef
+        .where('userId', '==', getUniqueId())
+        .get()
+        .then(querySnapshot => {
+          return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        });
 
-      setIsRecord(false);
-    },
-    [getCategories]
-  );
+      const user = await usersRef
+        .where('uniqueId', '==', getUniqueId())
+        .get()
+        .then(qs => {
+          if (qs.size > 0) {
+            const data = qs.docs[0].data();
+            return data;
+          }
+        });
+
+      const keywords = await keywordsRef
+        .where('categoryId', '==', `${user?.responseMode}`)
+        .orderBy('createdAt', 'asc')
+        .get()
+        .then(qs =>
+          qs.docs.map(doc => {
+            const { name, response } = doc.data();
+
+            return {
+              id: doc.id,
+              name,
+              response
+            };
+          })
+        );
+
+      const response = findPhrase(_command, keywords, randRes);
+      setTimeout(() => {
+        Tts.speak(response);
+      }, 100);
+
+      // usersRef
+      //   .where('uniqueId', '==', getUniqueId())
+      //   .get()
+      //   .then(querySnapshot => {
+      //     if (querySnapshot.size > 0) {
+      //       const data = querySnapshot.docs[0].data();
+      //       setUserData({ ...data });
+
+      // keywordsRef
+      //   .where('categoryId', '==', `${user?.responseMode}`)
+      //   .orderBy('createdAt', 'asc')
+      //   .onSnapshot(qs => {
+      //     const entries: any[] = [];
+      //     (qs ?? []).forEach(doc => {
+      //       const { name, response } = doc.data();
+      //       entries.push({
+      //         id: doc.id,
+      //         name,
+      //         response
+      //       });
+      //     });
+      //   });
+      //   }
+      // });
+    }
+
+    setIsRecord(false);
+  }, []);
 
   useEffect(() => {
     // signOut();

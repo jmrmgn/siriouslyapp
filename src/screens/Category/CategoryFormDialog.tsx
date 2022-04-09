@@ -10,6 +10,7 @@ import { IFormCoreProps } from 'interfaces/form';
 import { StyleSheet } from 'react-native';
 import { categorySchema } from './schemas/category';
 import firestore from '@react-native-firebase/firestore';
+import useAuthContext from 'hooks/useAuthContext';
 import { useCategoryStore } from './store/useCategoryStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -19,10 +20,9 @@ interface ICategoryFormDialogProps extends IFormCoreProps {
 }
 
 const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
-  const { isOpen, onClose, categoryId, category } = props;
+  const { isOpen, onClose, category } = props;
+  const { authData } = useAuthContext();
   const categoriesRef = firestore().collection('categories');
-
-  const { updateCategory } = useCategoryStore(state => state);
 
   const isEdit = !!category;
 
@@ -37,7 +37,11 @@ const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
   };
 
   const handleAdd = (data: ICategoryFormFields) => {
-    categoriesRef.add({ name: data.name, createdAt: new Date() });
+    categoriesRef.add({
+      name: data.name,
+      userId: authData.uniqueId,
+      createdAt: new Date()
+    });
     handleSuccess();
   };
 
@@ -52,9 +56,7 @@ const CategoryFormDialog = (props: ICategoryFormDialogProps) => {
   useEffect(() => {
     if (category) {
       reset({
-        name: category.name,
-        keywords: category.keywords,
-        responses: category.responses[0]
+        name: category.name
       });
     }
   }, [category]);

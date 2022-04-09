@@ -19,6 +19,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const Provider: React.FC = ({ children }) => {
   const [authData, setAuthData] = useState<any>();
+  const [userData, setUserData] = useState<any>();
   const [loading, setLoading] = useState(true);
   const usersRef = firestore().collection('users');
 
@@ -26,23 +27,22 @@ const Provider: React.FC = ({ children }) => {
     loadStorage();
   }, []);
 
-  const hasUser = () =>
+  const getUserData = async () =>
     usersRef
       .where('uniqueId', '==', getUniqueId())
       .onSnapshot(querySnapshot => {
         if (querySnapshot.size > 0) {
-          return !!querySnapshot.docs[0].data();
+          const data = querySnapshot.docs[0].data();
+          setUserData({ ...data });
         }
-
-        return false;
       });
 
   const loadStorage = async () => {
     try {
       // Try get the data from Async Storage
       const authDataSerialized = await AsyncStorage.getItem('@AuthData');
-
-      if (authDataSerialized && hasUser()) {
+      getUserData();
+      if (authDataSerialized) {
         // If there are data, it's converted to an Object and the state is updated.
         const _authData: AuthData = JSON.parse(authDataSerialized);
         setAuthData(_authData);
@@ -72,7 +72,14 @@ const Provider: React.FC = ({ children }) => {
   return (
     // This component will be used to encapsulate the whole App,
     // so all components will have access to the Context
-    <AuthContext.Provider value={{ authData, loading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{
+        authData: { ...authData, ...userData },
+        loading,
+        signIn,
+        signOut
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -6,18 +6,20 @@ import EmptyList from 'components/EmptyList';
 import { IRandomResponse } from './interfaces/randomResponse';
 import RandomResponseFormDialog from './RandomResponseFormDialog';
 import firestore from '@react-native-firebase/firestore';
+import useAuthContext from 'hooks/useAuthContext';
 
 const RandomResponseList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [entry, setEntry] = useState<IRandomResponse>();
-  const [randomResponses, setRandomResponses] = useState<IRandomResponse[]>([]);
-  const ref = firestore().collection('randomResponses');
+  const [randomResponses, setRandomResponses] = useState<any[]>([]);
+  const randResponseRef = firestore().collection('randomResponses');
+  const { authData } = useAuthContext();
 
   const handleClose = () => setIsOpen(false);
 
   const handlePressDelete = (id: string): void => {
     if (randomResponses.length > 3) {
-      ref
+      randResponseRef
         .doc(id)
         .delete()
         .then(() => {});
@@ -46,18 +48,21 @@ const RandomResponseList = () => {
   };
 
   useEffect(() => {
-    return ref.orderBy('createdAt', 'asc').onSnapshot(querySnapshot => {
-      const entries: IRandomResponse[] = [];
-      querySnapshot.forEach(doc => {
-        const { message } = doc.data();
-        entries.push({
-          id: doc.id,
-          message
+    return randResponseRef
+      .where('userId', '==', authData.uniqueId)
+      .orderBy('createdAt', 'asc')
+      .onSnapshot(querySnapshot => {
+        const entries: any[] = [];
+        querySnapshot.forEach(doc => {
+          const { message } = doc.data();
+          entries.push({
+            id: doc.id,
+            message
+          });
         });
-      });
 
-      setRandomResponses(entries);
-    });
+        setRandomResponses(entries);
+      });
   }, []);
 
   return (

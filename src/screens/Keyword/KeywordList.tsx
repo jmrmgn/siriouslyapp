@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 
 import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
-import { IKeyword } from './interfaces/keyword';
 import KeywordFormDialog from './KeywordFormDialog';
 import { TAppRouteProps } from 'routes/App/types';
 import firestore from '@react-native-firebase/firestore';
@@ -23,7 +22,7 @@ const KeywordList = () => {
   const handleClick = (_entry: any) => {
     setIsOpen(true);
 
-    setEntry(entry);
+    setEntry(_entry);
   };
 
   const handleDelete = (id: string) => {
@@ -52,7 +51,7 @@ const KeywordList = () => {
       .orderBy('createdAt', 'asc')
       .onSnapshot(querySnapshot => {
         const entries: any[] = [];
-        querySnapshot.forEach(doc => {
+        (querySnapshot ?? []).forEach(doc => {
           const { name, response } = doc.data();
           entries.push({
             id: doc.id,

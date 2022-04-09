@@ -8,6 +8,7 @@ import EmptyList from 'components/EmptyList';
 import { ICategory } from './interfaces/category';
 import { TAppNavProps } from 'routes/App/types';
 import firestore from '@react-native-firebase/firestore';
+import useAuthContext from 'hooks/useAuthContext';
 import { useCategoryStore } from './store/useCategoryStore';
 import { useNavigation } from '@react-navigation/native';
 
@@ -18,6 +19,7 @@ const CategoryList = () => {
   const { deleteCategory } = useCategoryStore(state => state);
   const navigation = useNavigation<TAppNavProps>();
   const categoriesRef = firestore().collection('categories');
+  const { authData } = useAuthContext();
 
   const handleClose = () => setIsOpen(false);
 
@@ -46,10 +48,11 @@ const CategoryList = () => {
 
   useEffect(() => {
     return categoriesRef
+      .where('userId', '==', `${authData.uniqueId}`)
       .orderBy('createdAt', 'asc')
       .onSnapshot(querySnapshot => {
         const entries: any[] = [];
-        querySnapshot.forEach(doc => {
+        (querySnapshot ?? []).forEach(doc => {
           const { name } = doc.data();
           entries.push({
             id: doc.id,
