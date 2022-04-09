@@ -179,7 +179,7 @@ const HomeScreen = () => {
         size={70}
         color={iconColor}
       />
-      <Text>{text}</Text>
+      <Text style={{ color: '#000' }}>{text}</Text>
     </View>
   );
 };

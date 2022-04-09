@@ -90,12 +90,18 @@ const NameField: React.FC = () => {
                 setSelectedCat(itemValue)
               }
               style={{
-                backgroundColor: '#e2e2e2'
+                backgroundColor: '#e2e2e2',
+                color: '#000'
               }}
             >
               {categories.map(cat => {
                 return (
-                  <Picker.Item key={cat.id} label={cat.name} value={cat.id} />
+                  <Picker.Item
+                    style={{ color: '#000' }}
+                    key={cat.id}
+                    label={cat.name}
+                    value={cat.id}
+                  />
                 );
               })}
             </Picker>

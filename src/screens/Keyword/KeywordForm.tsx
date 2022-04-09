@@ -40,6 +40,8 @@ const KeywordForm = () => {
               value={field.value}
               onChangeText={field.onChange}
               placeholder="Type response"
+              multiline
+              numberOfLines={3}
             />
             {errors?.response && (
               <HelperText type="error" visible={!!errors.response}>
