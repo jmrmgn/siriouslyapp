@@ -10,9 +10,8 @@ const Configuration = () => {
 
   return (
     <>
-      <ItemHeader headerLabel="Configuration" />
       <List.Item
-        title="Categories"
+        title="Keywords and Responses"
         left={props => (
           <List.Icon {...props} icon="format-list-bulleted-square" />
         )}

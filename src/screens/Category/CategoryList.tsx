@@ -6,6 +6,7 @@ import CategoryFormDialog from './CategoryFormDialog';
 import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
 import { ICategory } from './interfaces/category';
+import { ItemHeader } from 'components/common';
 import { TAppNavProps } from 'routes/App/types';
 import firestore from '@react-native-firebase/firestore';
 import useAuthContext from 'hooks/useAuthContext';
@@ -65,7 +66,8 @@ const CategoryList = () => {
   }, []);
 
   return (
-    <>
+    <View style={styles.container}>
+      <ItemHeader headerLabel="Tap a response mode to edit" />
       <FlatList
         data={categories}
         renderItem={({ item: entry }) => {
@@ -91,20 +93,15 @@ const CategoryList = () => {
         onClose={handleClose}
         category={category}
       />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    paddingVertical: 5
-  },
-  chip: {
-    marginRight: 5,
-    marginTop: 2
+  container: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingVertical: 10
   }
 });
 

@@ -5,7 +5,7 @@ import { Appbar } from 'react-native-paper';
 import { EAppScreen } from 'routes/App/enums';
 import React from 'react';
 
-const HEADER_TITLE = 'Siriously';
+const HEADER_TITLE = 'Seriously';
 
 export interface INavBarProps {
   back?: boolean;

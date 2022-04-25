@@ -1,62 +1,20 @@
-import {
-  Button,
-  Dialog,
-  Divider,
-  List,
-  Portal,
-  Text
-} from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
+import SettingsForm, { EFieldName } from './SettingsForm';
 import { StyleSheet, View } from 'react-native';
 
 import Configuration from './Configuration';
-import InputGroup from 'components/InputGroup';
 import { ItemHeader } from 'components/common';
-import { Picker } from '@react-native-picker/picker';
+import { List } from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore';
 import { getUniqueId } from 'react-native-device-info';
 
-const NameField: React.FC = () => {
-  const [selectedCat, setSelectedCat] = useState();
-  const [categories, setCategories] = useState<any[]>([]);
-  const categoriesRef = firestore().collection('categories');
+interface INameFieldProps {
+  onClick: (fieldName: EFieldName) => void;
+}
+
+const NameField = ({ onClick }: INameFieldProps) => {
   const usersRef = firestore().collection('users');
-
-  const [showDialog, setShowDialog] = useState(false);
   const [name, setName] = useState<string>('');
-  const [userId, setUserId] = useState<string>();
-
-  const handleChangeName = () => {
-    // TODO: Add validation if the uniqueId exist
-    const _responseMode = selectedCat;
-    const data = {
-      name,
-      responseMode: selectedCat,
-      responseModeTxt:
-        categories.find(cat => cat.id === _responseMode).name ?? ''
-    };
-
-    usersRef.doc(userId).update(data);
-    setShowDialog(false);
-  };
-
-  useEffect(() => {
-    return categoriesRef
-      .where('userId', '==', `${getUniqueId()}`)
-      .orderBy('createdAt', 'asc')
-      .onSnapshot(querySnapshot => {
-        const entries: any[] = [];
-        querySnapshot.forEach(doc => {
-          const { name } = doc.data();
-          entries.push({
-            id: doc.id,
-            name
-          });
-        });
-
-        setCategories(entries);
-      });
-  }, []);
 
   useEffect(() => {
     return usersRef
@@ -65,87 +23,29 @@ const NameField: React.FC = () => {
         if (querySnapshot.size > 0) {
           const data = querySnapshot.docs[0].data();
           setName(data.name);
-          setUserId(querySnapshot.docs[0].id);
-          setSelectedCat(data.responseMode);
         }
       });
   }, []);
 
   return (
     <>
-      <Portal>
-        <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
-          <Dialog.Title>Edit details</Dialog.Title>
-          <Dialog.Content>
-            <InputGroup
-              label="Name"
-              value={name}
-              onChangeText={text => setName(text)}
-              placeholder="Type name"
-            />
-            <Text>Response mode</Text>
-            <Picker
-              selectedValue={selectedCat}
-              onValueChange={(itemValue, itemIndex) =>
-                setSelectedCat(itemValue)
-              }
-              style={{
-                backgroundColor: '#e2e2e2',
-                color: '#000'
-              }}
-            >
-              {categories.map(cat => {
-                return (
-                  <Picker.Item
-                    style={{ color: '#000' }}
-                    key={cat.id}
-                    label={cat.name}
-                    value={cat.id}
-                  />
-                );
-              })}
-            </Picker>
-          </Dialog.Content>
-          <Dialog.Actions style={style.formActions}>
-            <Button
-              style={style.formButton}
-              mode="outlined"
-              onPress={() => {
-                setShowDialog(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              style={style.formButton}
-              mode="contained"
-              dark
-              onPress={handleChangeName}
-            >
-              Ok
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-      <ItemHeader
-        headerLabel="Details"
-        actionLabel="Edit"
-        onClickAction={() => {
-          setShowDialog(true);
-        }}
-      />
       <List.Item
-        title={name}
-        description="Name"
+        title="Name"
+        description={name}
         titleStyle={style.title}
         descriptionStyle={style.description}
         left={props => <List.Icon {...props} icon="account" />}
+        onPress={() => onClick(EFieldName.Name)}
       />
     </>
   );
 };
 
-const ResponseModeField = () => {
+interface IResponseModeFieldProps {
+  onClick: (fieldName: EFieldName) => void;
+}
+
+const ResponseModeField = ({ onClick }: IResponseModeFieldProps) => {
   const [responseModeTxt, setResponseModeTxt] = useState('');
   const usersRef = firestore().collection('users');
 
@@ -162,21 +62,37 @@ const ResponseModeField = () => {
 
   return (
     <List.Item
-      title={responseModeTxt}
-      description="Response mode"
+      title="Response mode"
+      description={responseModeTxt}
       titleStyle={style.title}
       descriptionStyle={style.description}
       left={props => <List.Icon {...props} icon="head-cog" />}
+      onPress={() => onClick(EFieldName.ResponseMode)}
     />
   );
 };
 
-const SettingsScreen: React.FC = () => {
+const SettingsScreen = () => {
+  const [open, setOpen] = useState(false);
+  const [selectedField, setSelectedField] = useState(EFieldName.Name);
+
+  const handleClick = (fieldName: EFieldName) => {
+    setSelectedField(fieldName);
+    setOpen(true);
+  };
+
+  const handleClose = () => setOpen(false);
+
   return (
     <View style={style.container}>
-      <NameField />
-      <ResponseModeField />
-      <Divider style={{ marginVertical: 10 }} />
+      <SettingsForm
+        open={open}
+        onClose={handleClose}
+        fieldName={selectedField}
+      />
+      <ItemHeader headerLabel="Tap to edit" actionLabel="Edit" />
+      <NameField onClick={handleClick} />
+      <ResponseModeField onClick={handleClick} />
       <Configuration />
     </View>
   );
@@ -188,8 +104,8 @@ const style = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10
   },
-  title: { color: '#000' },
-  description: { fontSize: 14, opacity: 0.75 },
+  title: { fontSize: 14, opacity: 0.75 },
+  description: { color: '#000' },
   formActions: {
     paddingHorizontal: 20,
     paddingBottom: 20,
