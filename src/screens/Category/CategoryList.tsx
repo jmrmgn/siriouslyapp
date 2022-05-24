@@ -1,8 +1,9 @@
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
-import { Chip, List, Text } from 'react-native-paper';
+import { List, Text } from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
 
 import CategoryFormDialog from './CategoryFormDialog';
+import Divider from 'components/Divider';
 import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
 import { ICategory } from './interfaces/category';
@@ -67,18 +68,21 @@ const CategoryList = () => {
 
   return (
     <View style={styles.container}>
-      <ItemHeader headerLabel="Tap a response mode to edit" />
+      <ItemHeader headerLabel="Tap a response-mode to edit. Long press to delete." />
       <FlatList
         data={categories}
         renderItem={({ item: entry }) => {
           return (
-            <List.Item
-              key={entry.id}
-              titleNumberOfLines={3}
-              title={entry.name}
-              onPress={() => handleClickCategory(entry)}
-              onLongPress={() => handleDelete(entry.id)}
-            />
+            <>
+              <List.Item
+                key={entry.id}
+                titleNumberOfLines={3}
+                title={entry.name}
+                onPress={() => handleClickCategory(entry)}
+                onLongPress={() => handleDelete(entry.id)}
+              />
+              <Divider />
+            </>
           );
         }}
         keyExtractor={item => String(item.id)}
@@ -99,9 +103,7 @@ const CategoryList = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 10
+    flex: 1
   }
 });
 

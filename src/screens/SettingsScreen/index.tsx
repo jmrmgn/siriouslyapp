@@ -62,7 +62,7 @@ const ResponseModeField = ({ onClick }: IResponseModeFieldProps) => {
 
   return (
     <List.Item
-      title="Response mode"
+      title="Current response-mode"
       description={responseModeTxt}
       titleStyle={style.title}
       descriptionStyle={style.description}
@@ -90,8 +90,8 @@ const SettingsScreen = () => {
         onClose={handleClose}
         fieldName={selectedField}
       />
-      <ItemHeader headerLabel="Tap to edit" actionLabel="Edit" />
-      <NameField onClick={handleClick} />
+      <ItemHeader headerLabel="Tap to edit" />
+      {/* <NameField onClick={handleClick} /> */}
       <ResponseModeField onClick={handleClick} />
       <Configuration />
     </View>
@@ -100,12 +100,10 @@ const SettingsScreen = () => {
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 10
+    flex: 1
   },
-  title: { fontSize: 14, opacity: 0.75 },
-  description: { color: '#000' },
+  title: { fontSize: 14, opacity: 0.75, fontWeight: 'bold' },
+  description: { color: '#000', fontWeight: 'bold' },
   formActions: {
     paddingHorizontal: 20,
     paddingBottom: 20,

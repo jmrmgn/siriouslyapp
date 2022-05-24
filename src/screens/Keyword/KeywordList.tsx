@@ -2,6 +2,7 @@ import { Alert, FlatList } from 'react-native';
 import { List, Text } from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
 
+import Divider from 'components/Divider';
 import { EAppScreen } from 'routes/App/enums';
 import EmptyList from 'components/EmptyList';
 import KeywordFormDialog from './KeywordFormDialog';
@@ -74,15 +75,18 @@ const KeywordList = () => {
         data={keywords}
         renderItem={({ item: entry }) => {
           return (
-            <List.Item
-              key={entry.id}
-              title={entry.name}
-              description={entry.response}
-              descriptionNumberOfLines={3}
-              descriptionStyle={{ fontStyle: 'italic' }}
-              onPress={() => handleClick(entry)}
-              onLongPress={() => handleDelete(entry.id)}
-            />
+            <>
+              <List.Item
+                key={entry.id}
+                title={entry.name}
+                description={entry.response}
+                descriptionNumberOfLines={3}
+                descriptionStyle={{ fontStyle: 'italic' }}
+                onPress={() => handleClick(entry)}
+                onLongPress={() => handleDelete(entry.id)}
+              />
+              <Divider />
+            </>
           );
         }}
         keyExtractor={item => String(item.id)}

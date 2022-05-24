@@ -1,5 +1,5 @@
 import { Button, Text, TextInput } from 'react-native-paper';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import Tts from 'react-native-tts';
@@ -15,11 +15,9 @@ const SetupScreen = () => {
   const keywordsRef = firestore().collection('keywords');
   const randomResponsesRef = firestore().collection('randomResponses');
 
-  const auth = useAuthContext();
-
-  // useEffect(() => {
-  //   init();
-  // }, []);
+  useEffect(() => {
+    initNewUser();
+  }, []);
 
   // const init = () => {
   //   Tts.speak('What is your name?');
@@ -86,23 +84,23 @@ const SetupScreen = () => {
       });
   };
 
-  const handleSave = async () => {
-    try {
-      if (!name || name === '') {
-        setErrorMessage('Name is required');
-        return;
-      }
+  // const handleSave = async () => {
+  //   try {
+  //     // if (!name || name === '') {
+  //     //   setErrorMessage('Name is required');
+  //     //   return;
+  //     // }
 
-      // // TODO: Add validation if the uniqueId exist
-      // const data = { name, uniqueId: getUniqueId(), createdAt: new Date() };
-      // usersRef.add(data);
-      initNewUser();
-    } catch (error) {}
-  };
+  //     // // TODO: Add validation if the uniqueId exist
+  //     // const data = { name, uniqueId: getUniqueId(), createdAt: new Date() };
+  //     // usersRef.add(data);
+  //     initNewUser();
+  //   } catch (error) {}
+  // };
 
   return (
     <View style={style.container}>
-      <Text>What is your name?</Text>
+      {/* <Text>What is your name?</Text>
       <TextInput
         autoFocus
         value={name}
@@ -119,7 +117,8 @@ const SetupScreen = () => {
         dark
       >
         Save
-      </Button>
+      </Button> */}
+      <Text>Loading...</Text>
     </View>
   );
 };

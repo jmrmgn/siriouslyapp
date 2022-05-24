@@ -76,7 +76,7 @@ const SettingsForm = (props: ISettingsFormProps) => {
   return (
     <Portal>
       <Dialog visible={open} onDismiss={onClose}>
-        <Dialog.Title>Edit details</Dialog.Title>
+        <Dialog.Title>Select a response-mode</Dialog.Title>
         <Dialog.Content>
           {fieldName === EFieldName.Name && (
             <InputGroup
@@ -88,7 +88,6 @@ const SettingsForm = (props: ISettingsFormProps) => {
           )}
           {fieldName === EFieldName.ResponseMode && (
             <>
-              <Text>Response mode</Text>
               <Picker
                 selectedValue={selectedCat}
                 onValueChange={(itemValue, itemIndex) =>

@@ -1,9 +1,11 @@
-import { Alert, FlatList } from 'react-native';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import { List, Text } from 'react-native-paper';
 import React, { useEffect, useState } from 'react';
 
+import Divider from 'components/Divider';
 import EmptyList from 'components/EmptyList';
 import { IRandomResponse } from './interfaces/randomResponse';
+import { ItemHeader } from 'components/common';
 import RandomResponseFormDialog from './RandomResponseFormDialog';
 import firestore from '@react-native-firebase/firestore';
 import useAuthContext from 'hooks/useAuthContext';
@@ -66,18 +68,22 @@ const RandomResponseList = () => {
   }, []);
 
   return (
-    <>
+    <View style={styles.container}>
+      <ItemHeader headerLabel="Tap a response to edit. Long press to delete." />
       <FlatList
         data={randomResponses}
         renderItem={({ item }) => (
-          <List.Item
-            key={item.id}
-            titleNumberOfLines={3}
-            title={item.message}
-            titleStyle={{ fontStyle: 'italic' }}
-            onPress={() => handleClickEntry(item)}
-            onLongPress={() => handleDelete(item.id)}
-          />
+          <>
+            <List.Item
+              key={item.id}
+              titleNumberOfLines={3}
+              title={item.message}
+              titleStyle={{ fontStyle: 'italic' }}
+              onPress={() => handleClickEntry(item)}
+              onLongPress={() => handleDelete(item.id)}
+            />
+            <Divider />
+          </>
         )}
         keyExtractor={item => String(item.id)}
         ListEmptyComponent={
@@ -92,8 +98,14 @@ const RandomResponseList = () => {
         // randomResponseId={entry?.id}
         randomResponse={entry}
       />
-    </>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  }
+});
 
 export default RandomResponseList;

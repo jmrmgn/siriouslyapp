@@ -23,10 +23,15 @@ const Navbar = (props: INavBarProps) => {
     <Appbar.Header dark>
       {back && <Appbar.BackAction onPress={navigation.goBack} />}
       <Appbar.Content title={isMainPage ? HEADER_TITLE : headerTitle} />
-      {isMainPage && (
+      {isMainPage ? (
         <Appbar.Action
           icon="dots-vertical"
           onPress={() => navigation.push(EAppScreen.Settings)}
+        />
+      ) : (
+        <Appbar.Action
+          icon="microphone"
+          onPress={() => navigation.popToTop()}
         />
       )}
     </Appbar.Header>

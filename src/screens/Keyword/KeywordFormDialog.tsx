@@ -1,3 +1,4 @@
+import { Alert, StyleSheet } from 'react-native';
 import { FormProvider, useForm } from 'react-hook-form';
 import React, { useEffect } from 'react';
 
@@ -6,7 +7,6 @@ import { EAppScreen } from 'routes/App/enums';
 import FormDialog from 'components/FormDialog';
 import { IFormCoreProps } from 'interfaces/form';
 import KeywordForm from './KeywordForm';
-import { StyleSheet } from 'react-native';
 import { TAppRouteProps } from 'routes/App/types';
 import { TKeywordFormFields } from './interfaces/keyword';
 import firestore from '@react-native-firebase/firestore';
@@ -31,11 +31,43 @@ const KeywordFormDialog = (props: IKeywordFormDialogProps) => {
     resolver: yupResolver(keywordSchema())
   });
 
-  const { handleSubmit, reset } = methods;
+  const {
+    handleSubmit,
+    reset,
+    formState: { isDirty }
+  } = methods;
 
   const handleSuccess = (): void => {
     reset();
     onClose();
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  const handlePreClose = () => {
+    if (isDirty) {
+      Alert.alert(
+        'Discard changes',
+        'Are you sure you want to discard all changes?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {},
+            style: 'cancel'
+          },
+          {
+            text: 'Discard',
+            onPress: handleClose
+          }
+        ]
+      );
+      return;
+    }
+
+    handleClose();
   };
 
   const handleAdd = (data: TKeywordFormFields): void => {
@@ -77,11 +109,15 @@ const KeywordFormDialog = (props: IKeywordFormDialogProps) => {
   return (
     <FormDialog
       isOpen={isOpen}
-      onClose={onClose}
-      title={`${title} keyword`}
+      onClose={handlePreClose}
+      title={`${title} Keywords and Responses`}
       actions={
         <>
-          <Button style={styles.formButton} mode="outlined" onPress={onClose}>
+          <Button
+            style={styles.formButton}
+            mode="outlined"
+            onPress={handlePreClose}
+          >
             Cancel
           </Button>
           <Button
